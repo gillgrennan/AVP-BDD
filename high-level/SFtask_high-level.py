@@ -3,6 +3,12 @@ import random
 import os
 import csv
 
+# Define task parameters
+n_blocks = 15
+trials_per_block = 20
+block_fixation_time = 10  # seconds
+oddball_probability = 0.1  # 10% chance of green fixation
+
 # Create a window
 win = visual.Window(size=(800, 800), color='gray', units='pix')
 
@@ -41,21 +47,55 @@ stimuli_images = {
     "NSF": load_images(stimuli_folder, "NSF")
 }
 
-# Define task parameters
-n_blocks = 15
-trials_per_block = 20
-block_fixation_time = 10  # seconds
-oddball_probability = 0.1  # 10% chance of green fixation
+# Load and shuffle stimuli once at the start
+stimuli_list = sorted(os.listdir(stimuli_folder))  # List of all stimuli
+stimuli_list = [stim for stim in stimuli_list if stim.endswith(".jpg")]  # Filter for images
+random.shuffle(stimuli_list)  # Shuffle the stimuli list once for the subject
 
-# Randomize the order of conditions across blocks
-block_conditions = random.sample(["LSF", "HSF", "NSF"] * 5, n_blocks)
+# Group stimuli by condition (NSF, HSF, LSF)
+stimuli_by_condition = {
+    "NSF": [img for img in stimuli_list if "-NSF.jpg" in img],
+    "HSF": [img for img in stimuli_list if "-HSF.jpg" in img],
+    "LSF": [img for img in stimuli_list if "-LSF.jpg" in img]
+}
+
+# Ensure all condition lists have the same order for overlapping stimuli
+shared_base_names = [img.split('-')[0] for img in stimuli_by_condition["NSF"]]  # Extract base names
+stimuli_by_condition["NSF"].sort(key=lambda x: shared_base_names.index(x.split('-')[0]))
+stimuli_by_condition["HSF"].sort(key=lambda x: shared_base_names.index(x.split('-')[0]))
+stimuli_by_condition["LSF"].sort(key=lambda x: shared_base_names.index(x.split('-')[0]))
+
+# Function to generate or load block order
+def get_block_order(subject_id, n_blocks):
+    file_name = f"Subject_{subject_id}_block_order.csv"
+    
+    # Check if the file exists
+    if os.path.exists(file_name):
+        print(f"Block order file found: {file_name}")
+        with open(file_name, 'r') as f:
+            reader = csv.reader(f)
+            block_order = next(reader)  # Read the first row as block order
+    else:
+        print(f"No block order file found for Subject {subject_id}. Generating a new order.")
+        block_order = random.sample(["LSF", "HSF", "NSF"] * (n_blocks // 3), n_blocks)
+        
+        # Save the block order to a CSV file
+        with open(file_name, 'w', newline='') as f:
+            writer = csv.writer(f)
+            writer.writerow(block_order)
+    
+    return block_order
+
+# Generate or load the block order
+block_conditions = get_block_order(subject_id, n_blocks)
 
 # Initialize data storage
 data_file = f"Subject_{subject_id}_Run_{run_number}_{stimulus_category}_RT.csv"
 with open(data_file, mode='w', newline='') as f:
     writer = csv.writer(f)
     writer.writerow(["Block", "Trial", "Condition", "Oddball", 
-                     "Reaction Time (s)", "Stimulus Onset (s)", "Stimulus Offset (s)"])
+                     "Reaction Time (s)", "Stimulus Onset (s)", 
+                     "Stimulus Offset (s)", "Stimulus Image"])
 
 # Function to check for force quit
 def check_quit():
@@ -85,7 +125,10 @@ global_clock = core.Clock()
 for block_num, condition in enumerate(block_conditions, start=1):
     print(f"Block {block_num}: {condition}")  # To keep track of conditions during testing
 
-    for trial in range(trials_per_block):
+    # Use the pre-shuffled stimuli list for this condition
+    block_stimuli = stimuli_by_condition[condition]
+
+    for trial, stimulus_image in enumerate(block_stimuli[:trials_per_block]):
         check_quit()  # Check for escape key before each trial
 
         # Decide randomly if the fixation cross should turn green (~10% of trials)
@@ -97,11 +140,8 @@ for block_num, condition in enumerate(block_conditions, start=1):
         win.flip()
         core.wait(0.1)  # 100 ms inter-stimulus fixation
 
-        # Select a random image for the current condition
-        stimulus_image = random.choice(stimuli_images[condition])
-        stim = visual.ImageStim(win, image=stimulus_image, size=(300, 300))
-
-        # Draw image with fixation cross (green if oddball)
+        # Draw the image with the fixation cross
+        stim = visual.ImageStim(win, image=os.path.join(stimuli_folder, stimulus_image), size=(300, 300))
         if green_fixation:
             fixation.color = 'green'
         else:
@@ -127,17 +167,12 @@ for block_num, condition in enumerate(block_conditions, start=1):
         win.flip()
         core.wait(0.1)  # 100 ms fixation interval
 
-        # Record any responses during the inter-stimulus interval
-        response_during_fixation = event.getKeys(keyList=["space"], timeStamped=global_clock)
-        if response_during_fixation and rt is None:
-            rt = response_during_fixation[0][1]  # Record reaction time if no earlier response
-
         # Save trial data
         with open(data_file, mode='a', newline='') as f:
             writer = csv.writer(f)
             writer.writerow([block_num, trial + 1, condition, green_fixation, 
-                             rt, stimulus_onset, stimulus_offset])
-
+                             rt, stimulus_onset, stimulus_offset, stimulus_image])
+                             
     # Inter-block fixation (always white cross)
     fixation.color = 'white'
     fixation.draw()
