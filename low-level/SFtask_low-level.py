@@ -52,8 +52,32 @@ trials_per_block = 20
 block_fixation_time = 10  # seconds
 oddball_probability = 0.1  # 10% chance of green fixation
 
+# Function to generate or load block order
+def get_block_order(subject_id, n_blocks):
+    file_name = f"Subject_{subject_id}_block_order.csv"
+    
+    # Check if the file exists
+    if os.path.exists(file_name):
+        print(f"Block order file found: {file_name}")
+        with open(file_name, 'r') as f:
+            reader = csv.reader(f)
+            block_order = next(reader)  # Read the first row as block order
+    else:
+        print(f"No block order file found for Subject {subject_id}. Generating a new order.")
+        block_order = random.sample(list(gabor_conditions.keys()) * 4, n_blocks)
+        
+        # Save the block order to a CSV file
+        with open(file_name, 'w', newline='') as f:
+            writer = csv.writer(f)
+            writer.writerow(block_order)
+    
+    return block_order
+
+# Generate or load the block order
+block_conditions = get_block_order(subject_id, n_blocks)
+
 # Randomize the order of conditions across blocks
-block_conditions = random.sample(list(gabor_conditions.keys()) * 4, n_blocks)
+#block_conditions = random.sample(list(gabor_conditions.keys()) * 4, n_blocks)
 
 # Initialize data storage
 data_file = os.path.join(data_folder, f"Subject_{subject_id}_Run_{run_number}_RT.csv")
