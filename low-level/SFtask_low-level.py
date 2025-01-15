@@ -4,7 +4,7 @@ import os
 import csv
 
 # Create a window
-win = visual.Window(size=(800, 800), color='gray', units='pix')
+win = visual.Window(size=(1920, 1080), color='gray', units='pix', fullscr=True, screen=1)
 
 # Popup to enter Subject ID and Run #
 info = {"Subject ID": "", "Run #": ""}
