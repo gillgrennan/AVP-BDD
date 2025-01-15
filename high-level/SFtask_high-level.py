@@ -10,7 +10,7 @@ block_fixation_time = 10  # seconds
 oddball_probability = 0.1  # 10% chance of green fixation
 
 # Create a window
-win = visual.Window(size=(800, 800), color='gray', units='pix')
+win = visual.Window(size=(1920, 1080), color='gray', units='pix', fullscr=True, screen=1)
 
 # Popup to enter Subject ID, Run #, and Stimulus Category
 info = {"Subject ID": "", "Run #": "", "Stimulus Category": ["House", "Face", "Body"]}
@@ -23,7 +23,7 @@ run_number = info["Run #"]
 stimulus_category = info["Stimulus Category"]
 
 # Determine folder based on stimulus category
-stimuli_folder = f"/Users/gilliangrennan/Desktop/CONNECTLab/AVP-BDD/fMRI-tasks/SF-task/high-level/{stimulus_category.lower()}_stimuli"  # e.g., "house_stimuli", "face_stimuli", "body_stimuli"
+stimuli_folder = f"/Users/Fang-Lab/Desktop/AVP-BDD-main/high-level/{stimulus_category.lower()}_stimuli"  # e.g., "house_stimuli", "face_stimuli", "body_stimuli"
 
 # Define fixation cross
 fixation = visual.TextStim(win, text='+', color='white', height=30)
