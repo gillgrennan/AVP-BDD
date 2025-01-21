@@ -1,0 +1,16 @@
+﻿target_list,probe_L,probe_R,correct_resp,n,key_resp_up_prac.corr_mean,key_resp_up_prac.corr_raw,key_resp_up_prac.corr_std,key_resp_up_prac.duration_mean,key_resp_up_prac.duration_raw,key_resp_up_prac.duration_std,key_resp_up_prac.keys_raw,key_resp_up_prac.rt_mean,key_resp_up_prac.rt_raw,key_resp_up_prac.rt_std,order
+stimuli/inverted_faces/M125.png,stimuli/inverted_faces/M125morph.png,stimuli/inverted_faces/M125.png,2,1.0,0.0,0.0,0.0,0.11443108320236206,0.11443108320236206,0.0,'left',14.146472930908203,14.146472930908203,0.0,0.0
+
+extraInfo
+participant,001
+session,1
+order,1
+EEG,False
+EyeLink,False
+EyeTribe,False
+Calibrate,False
+date,2025-01-21_10h30.07.108
+expName,inversion_effect
+psychopyVersion,2024.1.0
+frameRate,None
+expStart,2025-01-21 10h30.14.482682 -0800

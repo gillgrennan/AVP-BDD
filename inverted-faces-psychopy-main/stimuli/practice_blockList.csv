@@ -1,0 +1,2 @@
+﻿block_list,fix_dur,target_dur,isi_dur,probe_dur,iti_dur,stim_size
+stimuli/practice_stimuli.csv,0.5,5,0.5,3,0.5,0.41

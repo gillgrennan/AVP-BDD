@@ -1,0 +1,5 @@
+﻿block_list,fix_dur,target_dur,isi_dur,probe_dur,iti_dur,stim_size,condStim,condDur,condOrient,upright_flag,inverted_flag
+stimuli/inverted_faces/faces_stimuli_InvShort.csv,0,0.5,0.5,3,1,0.41,faces,short,inverted,0,1
+stimuli/inverted_faces/faces_stimuli_UpShort.csv,0,0.5,0.5,3,1,0.41,faces,short,upright,1,0
+stimuli/inverted_faces/faces_stimuli_InvLong.csv,0,5,0.5,3,1,0.41,faces,long,inverted,0,1
+stimuli/inverted_faces/faces_stimuli_UpLong.csv,0,5,0.5,3,1,0.41,faces,long,upright,1,0

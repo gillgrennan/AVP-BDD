@@ -1,0 +1,5 @@
+target_list,probe_L,probe_R,correct_resp
+stimuli/inverted_faces/M125.png,stimuli/inverted_faces/M125morph.png,stimuli/inverted_faces/M125.png,2
+stimuli/inverted_faces/M128.png,stimuli/inverted_faces/M128morph.png,stimuli/inverted_faces/M128.png,2
+stimuli/inverted_faces/F10.png,stimuli/inverted_faces/F10morph.png,stimuli/inverted_faces/F10.png,2
+stimuli/inverted_faces/F12.png,stimuli/inverted_faces/F12morph.png,stimuli/inverted_faces/F12.png,2

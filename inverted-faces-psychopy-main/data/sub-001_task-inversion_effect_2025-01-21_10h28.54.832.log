@@ -1,0 +1,60 @@
+5.8154 	ERROR 	Plugin `psychopy-cedrus` entry point requires module `psychopy_cedrus`, but it cannot be imported.
+10.1545 	INFO 	Loaded monitor calibration from ['2024_04_10 11:44']
+10.4145 	EXP 	Created window1 = Window(allowGUI=True, allowStencil=False, autoLog=True, backendConf=UNKNOWN, backgroundFit=<method-wrapper '__getattribute__' of attributeSetter object at 0x7fdcb998ee50>, backgroundImage=<method-wrapper '__getattribute__' of attributeSetter object at 0x7fdcb998edf0>, bitsMode=UNKNOWN, blendMode='avg', bpc=(8, 8, 8), color=array([0, 0, 0]), colorSpace='rgb', depthBits=8, fullscr=<method-wrapper '__getattribute__' of attributeSetter object at 0x7fdcb998ebe0>, gamma=None, gammaErrorPolicy='raise', infoMsg=UNKNOWN, lms=UNKNOWN, monitor=<psychopy.monitors.calibTools.Monitor object at 0x7fdcba986c40>, multiSample=False, name='window1', numSamples=2, pos=[360.0, 225.0], screen=0, size=array([2880, 1800]), stencilBits=0, stereo=False, title='PsychoPy', units='height', useFBO=True, useRetina=True, viewOri=0.0, viewPos=None, viewScale=None, waitBlanking=True, winType='pyglet')
+10.4146 	EXP 	window1: mouseVisible = True
+10.4146 	EXP 	window1: backgroundImage = ''
+10.4146 	EXP 	window1: backgroundFit = 'none'
+10.4148 	EXP 	window1: mouseVisible = True
+10.4150 	EXP 	window1: mouseVisible = True
+10.4178 	EXP 	window1: mouseVisible = True
+10.4184 	EXP 	window1: mouseVisible = True
+10.4247 	DEBUG 	TextBox2 loaded 1 chars with 0 blanks and 1 valid
+10.4262 	DEBUG 	TextBox2 loaded 1 chars with 0 blanks and 1 valid
+10.4277 	DEBUG 	TextBox2 loaded 1 chars with 0 blanks and 1 valid
+10.4298 	DEBUG 	TextBox2 loaded 1 chars with 0 blanks and 1 valid
+10.4318 	DEBUG 	TextBox2 loaded 1 chars with 0 blanks and 1 valid
+10.4327 	DEBUG 	TextBox2 loaded 1 chars with 0 blanks and 1 valid
+10.4342 	DEBUG 	TextBox2 loaded 1 chars with 0 blanks and 1 valid
+10.4363 	DEBUG 	TextBox2 loaded 1 chars with 0 blanks and 1 valid
+10.4369 	DEBUG 	TextBox2 loaded 1 chars with 0 blanks and 1 valid
+10.4376 	DEBUG 	TextBox2 loaded 1 chars with 0 blanks and 1 valid
+10.4391 	DEBUG 	TextBox2 loaded 1 chars with 0 blanks and 1 valid
+10.4406 	DEBUG 	TextBox2 loaded 1 chars with 0 blanks and 1 valid
+10.4420 	DEBUG 	TextBox2 loaded 1 chars with 0 blanks and 1 valid
+10.4435 	DEBUG 	TextBox2 loaded 1 chars with 0 blanks and 1 valid
+10.4447 	DEBUG 	TextBox2 loaded 1 chars with 0 blanks and 1 valid
+10.4464 	DEBUG 	TextBox2 loaded 1 chars with 0 blanks and 1 valid
+10.4478 	DEBUG 	TextBox2 loaded 1 chars with 0 blanks and 1 valid
+10.4486 	DEBUG 	TextBox2 loaded 1 chars with 0 blanks and 1 valid
+10.4495 	DEBUG 	TextBox2 loaded 1 chars with 0 blanks and 1 valid
+10.4517 	DEBUG 	TextBox2 loaded 1 chars with 0 blanks and 1 valid
+10.4523 	DEBUG 	TextBox2 loaded 1 chars with 0 blanks and 1 valid
+10.4526 	DEBUG 	Uploading Texture Font fontname to graphics card
+10.4560 	DEBUG 	Upload of Texture Font fontname complete
+10.4590 	EXP 	window1: mouseVisible = True
+10.4592 	EXP 	window1: mouseVisible = True
+10.4598 	EXP 	window1: mouseVisible = True
+10.4604 	EXP 	window1: mouseVisible = True
+10.4658 	DEBUG 	TextBox2 loaded 1 chars with 0 blanks and 1 valid
+10.4679 	DEBUG 	TextBox2 loaded 1 chars with 0 blanks and 1 valid
+10.4702 	DEBUG 	TextBox2 loaded 1 chars with 0 blanks and 1 valid
+10.4705 	DEBUG 	Uploading Texture Font fontname to graphics card
+10.4711 	DEBUG 	Upload of Texture Font fontname complete
+10.4745 	EXP 	window1: Attempting to measure frame rate of screen (0) ...
+10.4745 	EXP 	window1: recordFrameIntervals = False
+10.8199 	EXP 	window1: recordFrameIntervals = True
+11.0039 	EXP 	Screen (0) actual frame rate measured at 59.93Hz
+11.0040 	EXP 	window1: recordFrameIntervals = False
+11.0060 	EXP 	window1: mouseVisible = False
+13.6918 	INFO 	keyboard.Keyboard is using iohub backend.
+13.6919 	INFO 	keyboard.Keyboard is using iohub backend.
+13.6919 	INFO 	keyboard.Keyboard is using iohub backend.
+13.6920 	INFO 	keyboard.Keyboard is using iohub backend.
+13.6920 	INFO 	keyboard.Keyboard is using iohub backend.
+13.6921 	INFO 	keyboard.Keyboard is using iohub backend.
+13.6921 	INFO 	keyboard.Keyboard is using iohub backend.
+13.6922 	EXP 	inversion_effect: status = STARTED
+14.2658 	EXP 	window1: mouseVisible = True
+14.2678 	DEBUG 	Saving data for inversion_effect ExperimentHandler
+14.2688 	INFO 	saved data to /Users/gilliangrennan/Downloads/inverted-faces-psychopy-main/data/sub-001_task-inversion_effect_2025-01-21_10h28.54.832.psydat
+14.2695 	INFO 	saved data to '/Users/gilliangrennan/Downloads/inverted-faces-psychopy-main/data/sub-001_task-inversion_effect_2025-01-21_10h28.54.832.csv'
