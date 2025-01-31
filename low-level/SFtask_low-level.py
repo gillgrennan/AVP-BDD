@@ -20,7 +20,7 @@ data_folder = "data"
 os.makedirs(data_folder, exist_ok=True)
 
 # Define fixation cross
-fixation = visual.TextStim(win, text='+', color='white', height=30)
+fixation = visual.TextStim(win, text='+', color='white', height=65)
 
 # Define instructions screen
 instructions = visual.TextStim(win, text=(
@@ -28,7 +28,7 @@ instructions = visual.TextStim(win, text=(
     "Occasionally, the fixation cross at the center will turn GREEN.\n"
     "When this happens, press the button as quickly as possible.\n\n\n"
     "Waiting for scanner..."
-), color='white', height=20, wrapWidth=700, alignText='center')
+), color='white', height=50, wrapWidth=1500, alignText='center')
 
 # Define Gabor patches for each condition
 gabor_conditions = {
@@ -41,7 +41,7 @@ gabor_conditions = {
 # Create Gabor stimuli
 gabor_stimuli = {
     cond: visual.GratingStim(win, tex="sin", mask="gauss", units="pix",
-                             size=(300, 300), sf=params["sf"],
+                             size=(500, 500), sf=params["sf"],
                              contrast=params["contrast"])
     for cond, params in gabor_conditions.items()
 }
