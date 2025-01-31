@@ -26,7 +26,7 @@ stimulus_category = info["Stimulus Category"]
 stimuli_folder = f"/Users/Fang-Lab/Desktop/AVP-BDD-main/high-level/{stimulus_category.lower()}_stimuli"  # e.g., "house_stimuli", "face_stimuli", "body_stimuli"
 
 # Define fixation cross
-fixation = visual.TextStim(win, text='+', color='white', height=30)
+fixation = visual.TextStim(win, text='+', color='white', height=65)
 
 # Define instructions screen
 instructions = visual.TextStim(win, text=(
@@ -34,7 +34,7 @@ instructions = visual.TextStim(win, text=(
     "Occasionally, the fixation cross at the center will turn GREEN.\n"
     "When this happens, press the button as quickly as possible.\n\n\n"
     "Waiting for scanner..."
-), color='white', height=20, wrapWidth=700, alignText='center')
+), color='white', height=50, wrapWidth=1500, alignText='center')
 
 # Function to load images by type
 def load_images(folder, filter_type):
@@ -141,7 +141,7 @@ for block_num, condition in enumerate(block_conditions, start=1):
         core.wait(0.1)  # 100 ms inter-stimulus fixation
 
         # Draw the image with the fixation cross
-        stim = visual.ImageStim(win, image=os.path.join(stimuli_folder, stimulus_image), size=(300, 300))
+        stim = visual.ImageStim(win, image=os.path.join(stimuli_folder, stimulus_image), size=(500, 500))
         if green_fixation:
             fixation.color = 'green'
         else:
@@ -185,9 +185,9 @@ for block_num, condition in enumerate(block_conditions, start=1):
     core.wait(block_fixation_time)
 
 # Display plain screen for the last 5 seconds
-win.color = 'gray'
-win.flip()
-core.wait(5)
+#win.color = 'gray'
+#win.flip()
+#core.wait(5)
 
 # Close the window
 win.close()
