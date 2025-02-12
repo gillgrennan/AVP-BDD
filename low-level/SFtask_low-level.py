@@ -32,10 +32,10 @@ instructions = visual.TextStim(win, text=(
 
 # Define Gabor patches for each condition
 gabor_conditions = {
-    "Condition 1": {"sf": 0.02, "contrast": 1},
-    "Condition 2": {"sf": 0.1, "contrast": 1},
-    "Condition 3": {"sf": 0.02, "contrast": 0.5},
-    "Condition 4": {"sf": 0.1, "contrast": 0.5},
+    "Condition 1": {"sf": 0.004, "contrast": 1}, #1 cpd: [cpd / num pixels = sf val for psychopy] 
+    "Condition 2": {"sf": 0.032, "contrast": 1}, #16 cpd: [cpd / num pixels = sf val for psychopy] 
+    "Condition 3": {"sf": 0.004, "contrast": 0.04}, #1 cpd 
+    "Condition 4": {"sf": 0.032, "contrast": 0.04}, #16 cpd
 }
 
 # Create Gabor stimuli
