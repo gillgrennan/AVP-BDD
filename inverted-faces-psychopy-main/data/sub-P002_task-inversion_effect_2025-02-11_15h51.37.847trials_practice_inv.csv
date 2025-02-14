@@ -1,0 +1,16 @@
+﻿target_list,probe_L,probe_R,correct_resp,n,key_resp_inv_prac.corr_mean,key_resp_inv_prac.corr_raw,key_resp_inv_prac.corr_std,key_resp_inv_prac.keys_raw,order
+stimuli/inverted_faces/F10.png,stimuli/inverted_faces/F10morph.png,stimuli/inverted_faces/F10.png,2,1.0,0.0,0.0,0.0,,0.0
+
+extraInfo
+participant,P002
+session,1
+order,2
+EEG,False
+EyeLink,False
+EyeTribe,False
+Calibrate,False
+date,2025-02-11_15h51.37.847
+expName,inversion_effect
+psychopyVersion,2024.1.0
+frameRate,None
+expStart,2025-02-11 15h52.00.114992 -0800

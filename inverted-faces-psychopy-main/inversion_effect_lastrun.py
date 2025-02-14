@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy3 Experiment Builder (v2024.1.0),
-    on Tue Jan 21 10:29:57 2025
+    on February 11, 2025, at 15:51
 If you publish work using this script the most relevant publication is:
 
     Peirce J, Gray JR, Simpson S, MacAskill M, Höchenberger R, Sogo H, Kastman E, Lindeløv JK. (2019) 
@@ -146,7 +146,7 @@ def setupData(expInfo, dataDir=None):
     thisExp = data.ExperimentHandler(
         name=expName, version='',
         extraInfo=expInfo, runtimeInfo=None,
-        originPath='/Users/gilliangrennan/Downloads/inverted-faces-psychopy-main/inversion_effect_lastrun.py',
+        originPath='C:\\Users\\Psychophysics\\Desktop\\AVP-BDD\\inverted-faces-psychopy-main\\inversion_effect_lastrun.py',
         savePickle=True, saveWideText=True,
         dataFileName=dataDir + os.sep + filename, sortColumns='time'
     )
