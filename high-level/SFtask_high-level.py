@@ -154,7 +154,7 @@ for block_num, condition in enumerate(block_conditions, start=1):
 
         # Record reaction times
         rt = None
-        response = event.getKeys(keyList=["y"], timeStamped=global_clock)
+        response = event.getKeys(keyList=["g"], timeStamped=global_clock)
         if response:
             rt = response[0][1]  # Capture the timestamp of the response
 
@@ -168,7 +168,7 @@ for block_num, condition in enumerate(block_conditions, start=1):
         core.wait(0.1)  # 100 ms fixation interval
         
         # record any responses during ITI
-        response_during_fixation = event.getKeys(keyList=["y"],timeStamped=global_clock)
+        response_during_fixation = event.getKeys(keyList=["g"],timeStamped=global_clock)
         if response_during_fixation and rt is None:
             rt = response_during_fixation[0][1] # record reaction time if no earlier response 
 
