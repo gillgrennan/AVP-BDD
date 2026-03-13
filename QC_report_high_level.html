@@ -1,0 +1,848 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>High-Level Task QC Report</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+            border-bottom: 3px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #555;
+            margin-top: 30px;
+        }
+        .summary-box {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .stat-card.patients {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        .stat-card.controls {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            position: sticky;
+            top: 0;
+        }
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        .status-PASS {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .status-WARN {
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .status-FAIL {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .thumbnail {
+            max-width: 200px;
+            cursor: pointer;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            transition: transform 0.2s;
+        }
+        .thumbnail:hover {
+            transform: scale(1.05);
+            border-color: #4CAF50;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.9);
+        }
+        .modal-content {
+            margin: auto;
+            display: block;
+            max-width: 90%;
+            max-height: 90%;
+            margin-top: 2%;
+        }
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 35px;
+            color: #f1f1f1;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .value-good {
+            color: #155724;
+            font-weight: bold;
+        }
+        .value-warn {
+            color: #856404;
+            font-weight: bold;
+        }
+        .value-bad {
+            color: #721c24;
+            font-weight: bold;
+        }
+        .filter-buttons {
+            margin: 20px 0;
+        }
+        .filter-btn {
+            padding: 10px 20px;
+            margin-right: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .filter-btn.active {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .filter-btn:not(.active) {
+            background-color: #ddd;
+            color: #333;
+        }
+        .mini-table {
+            font-size: 10px;
+            margin: 0;
+        }
+        .mini-table td {
+            padding: 2px 5px;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔬 High-Level Task Quality Control Report</h1>
+    
+    <div class="summary-box">
+        <h2>Summary Statistics</h2>
+        <div class="summary-stats">
+            <div class="stat-card">
+                <div class="stat-label">Total Subjects</div>
+                <div class="stat-value">57</div>
+            </div>
+            <div class="stat-card patients">
+                <div class="stat-label">Patients</div>
+                <div class="stat-value">29</div>
+            </div>
+            <div class="stat-card controls">
+                <div class="stat-label">Controls</div>
+                <div class="stat-value">28</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">QC PASS</div>
+                <div class="stat-value">45</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">QC WARN</div>
+                <div class="stat-value">2</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">QC FAIL</div>
+                <div class="stat-value">10</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="summary-box">
+        <h2>Mean Response Statistics</h2>
+        <p><strong>Overall Mean Response:</strong> 0.494% (SD = 0.647%)</p>
+        <p><strong>Patients Mean:</strong> 0.436% | <strong>Controls Mean:</strong> 0.553%</p>
+    </div>
+    
+    <div class="filter-buttons">
+        <button class="filter-btn active" onclick="filterTable('ALL')">Show All</button>
+        <button class="filter-btn" onclick="filterTable('FAIL')">Show FAIL Only</button>
+        <button class="filter-btn" onclick="filterTable('WARN')">Show WARN Only</button>
+        <button class="filter-btn" onclick="filterTable('PASS')">Show PASS Only</button>
+        <button class="filter-btn" onclick="filterTable('Patient')">Patients Only</button>
+        <button class="filter-btn" onclick="filterTable('Control')">Controls Only</button>
+    </div>
+    
+    <h2>Individual Subject Details</h2>
+    <table id="qcTable">
+        <thead>
+            <tr>
+                <th>Subject</th>
+                <th>Group</th>
+                <th>QC Status</th>
+                <th>Flags</th>
+                <th>Mean Response (%)</th>
+                <th>Category × SF Responses</th>
+                <th>Event-Related Plots</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            <tr data-status="FAIL" data-group="Control">
+                <td><strong>217</strong></td>
+                <td>Control</td>
+                <td><span class="status-FAIL">FAIL</span></td>
+                <td>Inverted response</td>
+                <td class="value-bad">-0.189%</td>
+                <td><table class='mini-table'><tr><th></th><th>LSF</th><th>NSF</th><th>HSF</th></tr><tr><td><strong>Face</strong></td><td class='value-bad'>-0.40</td><td class='value-bad'>-0.23</td><td class='value-bad'>-0.66</td></tr><tr><td><strong>Body</strong></td><td class='value-bad'>-0.57</td><td class='value-bad'>-0.80</td><td class='value-good'>0.41</td></tr><tr><td><strong>House</strong></td><td class='value-good'>0.44</td><td class='value-good'>0.99</td><td class='value-bad'>-0.86</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/high-level/event_related/individual_subjects/sub-217_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="FAIL" data-group="Patient">
+                <td><strong>103</strong></td>
+                <td>Patient</td>
+                <td><span class="status-FAIL">FAIL</span></td>
+                <td>Inverted response, Strongly inverted</td>
+                <td class="value-bad">-0.638%</td>
+                <td><table class='mini-table'><tr><th></th><th>LSF</th><th>NSF</th><th>HSF</th></tr><tr><td><strong>Face</strong></td><td class='value-bad'>-0.49</td><td class='value-bad'>-0.60</td><td class='value-bad'>-0.67</td></tr><tr><td><strong>Body</strong></td><td class='value-bad'>-0.84</td><td class='value-bad'>-1.58</td><td class='value-bad'>-2.22</td></tr><tr><td><strong>House</strong></td><td class='value-good'>0.39</td><td class='value-good'>0.34</td><td class='value-bad'>-0.06</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/high-level/event_related/individual_subjects/sub-103_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="FAIL" data-group="Patient">
+                <td><strong>104</strong></td>
+                <td>Patient</td>
+                <td><span class="status-FAIL">FAIL</span></td>
+                <td>Inverted response</td>
+                <td class="value-bad">-0.259%</td>
+                <td><table class='mini-table'><tr><th></th><th>LSF</th><th>NSF</th><th>HSF</th></tr><tr><td><strong>Face</strong></td><td class='value-bad'>-0.39</td><td class='value-bad'>-0.51</td><td class='value-bad'>-0.70</td></tr><tr><td><strong>Body</strong></td><td class='value-bad'>-1.44</td><td class='value-bad'>-2.84</td><td class='value-bad'>-0.73</td></tr><tr><td><strong>House</strong></td><td class='value-good'>0.90</td><td class='value-good'>2.73</td><td class='value-good'>0.64</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/high-level/event_related/individual_subjects/sub-104_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="FAIL" data-group="Control">
+                <td><strong>228</strong></td>
+                <td>Control</td>
+                <td><span class="status-FAIL">FAIL</span></td>
+                <td>Inverted response</td>
+                <td class="value-bad">-0.407%</td>
+                <td><table class='mini-table'><tr><th></th><th>LSF</th><th>NSF</th><th>HSF</th></tr><tr><td><strong>Face</strong></td><td class='value-bad'>-0.82</td><td class='value-good'>0.99</td><td class='value-good'>0.87</td></tr><tr><td><strong>Body</strong></td><td class='value-bad'>-0.19</td><td class='value-good'>0.37</td><td class='value-bad'>-0.44</td></tr><tr><td><strong>House</strong></td><td class='value-bad'>-2.12</td><td class='value-bad'>-1.63</td><td class='value-bad'>-0.68</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/high-level/event_related/individual_subjects/sub-228_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="FAIL" data-group="Patient">
+                <td><strong>106</strong></td>
+                <td>Patient</td>
+                <td><span class="status-FAIL">FAIL</span></td>
+                <td>Inverted response</td>
+                <td class="value-bad">-0.186%</td>
+                <td><table class='mini-table'><tr><th></th><th>LSF</th><th>NSF</th><th>HSF</th></tr><tr><td><strong>Face</strong></td><td class='value-bad'>-1.33</td><td class='value-bad'>-0.82</td><td class='value-bad'>-0.86</td></tr><tr><td><strong>Body</strong></td><td class='value-good'>0.20</td><td class='value-good'>0.31</td><td class='value-good'>0.05</td></tr><tr><td><strong>House</strong></td><td class='value-good'>0.70</td><td class='value-bad'>-0.72</td><td class='value-good'>0.79</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/high-level/event_related/individual_subjects/sub-106_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="FAIL" data-group="Patient">
+                <td><strong>119</strong></td>
+                <td>Patient</td>
+                <td><span class="status-FAIL">FAIL</span></td>
+                <td>Inverted response, Strongly inverted</td>
+                <td class="value-bad">-1.323%</td>
+                <td><table class='mini-table'><tr><th></th><th>LSF</th><th>NSF</th><th>HSF</th></tr><tr><td><strong>Face</strong></td><td class='value-bad'>-2.04</td><td class='value-bad'>-0.89</td><td class='value-bad'>-0.85</td></tr><tr><td><strong>Body</strong></td><td class='value-bad'>-1.30</td><td class='value-bad'>-1.20</td><td class='value-good'>0.14</td></tr><tr><td><strong>House</strong></td><td class='value-bad'>-2.59</td><td class='value-bad'>-1.22</td><td class='value-bad'>-1.95</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/high-level/event_related/individual_subjects/sub-119_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="FAIL" data-group="Control">
+                <td><strong>226</strong></td>
+                <td>Control</td>
+                <td><span class="status-FAIL">FAIL</span></td>
+                <td>Inverted response, Strongly inverted</td>
+                <td class="value-bad">-0.527%</td>
+                <td><table class='mini-table'><tr><th></th><th>LSF</th><th>NSF</th><th>HSF</th></tr><tr><td><strong>Face</strong></td><td class='value-good'>0.63</td><td class='value-good'>0.60</td><td class='value-good'>0.93</td></tr><tr><td><strong>Body</strong></td><td class='value-bad'>-2.44</td><td class='value-bad'>-1.60</td><td class='value-bad'>-0.96</td></tr><tr><td><strong>House</strong></td><td class='value-bad'>-0.62</td><td class='value-bad'>-0.67</td><td class='value-bad'>-0.62</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/high-level/event_related/individual_subjects/sub-226_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="FAIL" data-group="Control">
+                <td><strong>202</strong></td>
+                <td>Control</td>
+                <td><span class="status-FAIL">FAIL</span></td>
+                <td>Inverted response, Strongly inverted</td>
+                <td class="value-bad">-0.684%</td>
+                <td><table class='mini-table'><tr><th></th><th>LSF</th><th>NSF</th><th>HSF</th></tr><tr><td><strong>Face</strong></td><td class='value-bad'>-1.16</td><td class='value-bad'>-1.23</td><td class='value-bad'>-1.36</td></tr><tr><td><strong>Body</strong></td><td class='value-good'>0.21</td><td class='value-good'>0.08</td><td class='value-bad'>-0.72</td></tr><tr><td><strong>House</strong></td><td class='value-bad'>-0.51</td><td class='value-bad'>-0.93</td><td class='value-bad'>-0.52</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/high-level/event_related/individual_subjects/sub-202_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="FAIL" data-group="Patient">
+                <td><strong>123</strong></td>
+                <td>Patient</td>
+                <td><span class="status-FAIL">FAIL</span></td>
+                <td>Inverted response, Strongly inverted</td>
+                <td class="value-bad">-0.987%</td>
+                <td><table class='mini-table'><tr><th></th><th>LSF</th><th>NSF</th><th>HSF</th></tr><tr><td><strong>Face</strong></td><td class='value-bad'>-1.15</td><td class='value-bad'>-0.86</td><td class='value-bad'>-0.29</td></tr><tr><td><strong>Body</strong></td><td class='value-bad'>-0.97</td><td class='value-bad'>-1.12</td><td class='value-good'>1.45</td></tr><tr><td><strong>House</strong></td><td class='value-bad'>-1.84</td><td class='value-bad'>-2.21</td><td class='value-bad'>-1.90</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/high-level/event_related/individual_subjects/sub-123_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="FAIL" data-group="Patient">
+                <td><strong>127</strong></td>
+                <td>Patient</td>
+                <td><span class="status-FAIL">FAIL</span></td>
+                <td>Inverted response</td>
+                <td class="value-bad">-0.115%</td>
+                <td><table class='mini-table'><tr><th></th><th>LSF</th><th>NSF</th><th>HSF</th></tr><tr><td><strong>Face</strong></td><td class='value-good'>0.39</td><td class='value-good'>0.63</td><td class='value-bad'>-0.04</td></tr><tr><td><strong>Body</strong></td><td class='value-bad'>-0.06</td><td class='value-good'>0.24</td><td class='value-bad'>-0.87</td></tr><tr><td><strong>House</strong></td><td class='value-bad'>-0.02</td><td class='value-bad'>-1.54</td><td class='value-good'>0.22</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/high-level/event_related/individual_subjects/sub-127_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="WARN" data-group="Control">
+                <td><strong>207</strong></td>
+                <td>Control</td>
+                <td><span class="status-WARN">WARN</span></td>
+                <td>Inverted response, Weak response</td>
+                <td class="value-bad">-0.008%</td>
+                <td><table class='mini-table'><tr><th></th><th>LSF</th><th>NSF</th><th>HSF</th></tr><tr><td><strong>Face</strong></td><td class='value-good'>0.44</td><td class='value-good'>0.74</td><td class='value-good'>0.84</td></tr><tr><td><strong>Body</strong></td><td class='value-bad'>-0.34</td><td class='value-good'>0.28</td><td class='value-bad'>-0.07</td></tr><tr><td><strong>House</strong></td><td class='value-bad'>-0.99</td><td class='value-bad'>-1.21</td><td class='value-good'>0.24</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/high-level/event_related/individual_subjects/sub-207_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="WARN" data-group="Patient">
+                <td><strong>124</strong></td>
+                <td>Patient</td>
+                <td><span class="status-WARN">WARN</span></td>
+                <td>Weak response</td>
+                <td class="value-warn">0.079%</td>
+                <td><table class='mini-table'><tr><th></th><th>LSF</th><th>NSF</th><th>HSF</th></tr><tr><td><strong>Face</strong></td><td class='value-bad'>-0.90</td><td class='value-bad'>-1.05</td><td class='value-bad'>-1.05</td></tr><tr><td><strong>Body</strong></td><td class='value-good'>1.90</td><td class='value-good'>2.72</td><td class='value-good'>1.83</td></tr><tr><td><strong>House</strong></td><td class='value-bad'>-1.02</td><td class='value-bad'>-0.15</td><td class='value-bad'>-1.57</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/high-level/event_related/individual_subjects/sub-124_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Control">
+                <td><strong>212</strong></td>
+                <td>Control</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-warn">0.283%</td>
+                <td><table class='mini-table'><tr><th></th><th>LSF</th><th>NSF</th><th>HSF</th></tr><tr><td><strong>Face</strong></td><td class='value-bad'>-0.22</td><td class='value-bad'>-0.77</td><td class='value-good'>0.42</td></tr><tr><td><strong>Body</strong></td><td class='value-good'>0.46</td><td class='value-good'>0.81</td><td class='value-bad'>-0.46</td></tr><tr><td><strong>House</strong></td><td class='value-good'>0.62</td><td class='value-good'>1.34</td><td class='value-good'>0.34</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/high-level/event_related/individual_subjects/sub-212_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Control">
+                <td><strong>209</strong></td>
+                <td>Control</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">1.093%</td>
+                <td><table class='mini-table'><tr><th></th><th>LSF</th><th>NSF</th><th>HSF</th></tr><tr><td><strong>Face</strong></td><td class='value-good'>0.73</td><td class='value-good'>1.00</td><td class='value-good'>1.99</td></tr><tr><td><strong>Body</strong></td><td class='value-good'>1.74</td><td class='value-good'>0.88</td><td class='value-good'>0.98</td></tr><tr><td><strong>House</strong></td><td class='value-good'>0.55</td><td class='value-good'>0.84</td><td class='value-good'>1.13</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/high-level/event_related/individual_subjects/sub-209_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Control">
+                <td><strong>210</strong></td>
+                <td>Control</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">0.681%</td>
+                <td><table class='mini-table'><tr><th></th><th>LSF</th><th>NSF</th><th>HSF</th></tr><tr><td><strong>Face</strong></td><td class='value-bad'>-0.43</td><td class='value-bad'>-0.79</td><td class='value-bad'>-0.62</td></tr><tr><td><strong>Body</strong></td><td class='value-good'>1.86</td><td class='value-good'>1.36</td><td class='value-good'>1.63</td></tr><tr><td><strong>House</strong></td><td class='value-good'>1.29</td><td class='value-good'>0.53</td><td class='value-good'>1.31</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/high-level/event_related/individual_subjects/sub-210_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Control">
+                <td><strong>208</strong></td>
+                <td>Control</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">0.781%</td>
+                <td><table class='mini-table'><tr><th></th><th>LSF</th><th>NSF</th><th>HSF</th></tr><tr><td><strong>Face</strong></td><td class='value-good'>1.11</td><td class='value-good'>1.40</td><td class='value-good'>1.81</td></tr><tr><td><strong>Body</strong></td><td class='value-bad'>-1.38</td><td class='value-bad'>-0.15</td><td class='value-bad'>-1.31</td></tr><tr><td><strong>House</strong></td><td class='value-good'>0.95</td><td class='value-good'>2.36</td><td class='value-good'>2.24</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/high-level/event_related/individual_subjects/sub-208_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Control">
+                <td><strong>206</strong></td>
+                <td>Control</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">1.574%</td>
+                <td><table class='mini-table'><tr><th></th><th>LSF</th><th>NSF</th><th>HSF</th></tr><tr><td><strong>Face</strong></td><td class='value-good'>0.82</td><td class='value-good'>1.78</td><td class='value-good'>2.08</td></tr><tr><td><strong>Body</strong></td><td class='value-good'>0.88</td><td class='value-good'>1.34</td><td class='value-good'>1.93</td></tr><tr><td><strong>House</strong></td><td class='value-good'>1.97</td><td class='value-good'>1.36</td><td class='value-good'>2.01</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/high-level/event_related/individual_subjects/sub-206_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Control">
+                <td><strong>211</strong></td>
+                <td>Control</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">1.138%</td>
+                <td><table class='mini-table'><tr><th></th><th>LSF</th><th>NSF</th><th>HSF</th></tr><tr><td><strong>Face</strong></td><td class='value-good'>0.85</td><td class='value-good'>1.75</td><td class='value-good'>0.57</td></tr><tr><td><strong>Body</strong></td><td class='value-good'>1.08</td><td class='value-good'>0.69</td><td class='value-good'>1.83</td></tr><tr><td><strong>House</strong></td><td class='value-good'>1.42</td><td class='value-good'>0.90</td><td class='value-good'>1.17</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/high-level/event_related/individual_subjects/sub-211_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Control">
+                <td><strong>213</strong></td>
+                <td>Control</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">0.611%</td>
+                <td><table class='mini-table'><tr><th></th><th>LSF</th><th>NSF</th><th>HSF</th></tr><tr><td><strong>Face</strong></td><td class='value-good'>0.43</td><td class='value-bad'>-0.18</td><td class='value-good'>0.43</td></tr><tr><td><strong>Body</strong></td><td class='value-bad'>-1.23</td><td class='value-good'>0.19</td><td class='value-good'>0.27</td></tr><tr><td><strong>House</strong></td><td class='value-good'>1.26</td><td class='value-good'>1.91</td><td class='value-good'>2.42</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/high-level/event_related/individual_subjects/sub-213_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Patient">
+                <td><strong>102</strong></td>
+                <td>Patient</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-warn">0.268%</td>
+                <td><table class='mini-table'><tr><th></th><th>LSF</th><th>NSF</th><th>HSF</th></tr><tr><td><strong>Face</strong></td><td class='value-bad'>-2.14</td><td class='value-bad'>-2.59</td><td class='value-bad'>-2.26</td></tr><tr><td><strong>Body</strong></td><td class='value-good'>1.29</td><td class='value-good'>1.50</td><td class='value-good'>1.51</td></tr><tr><td><strong>House</strong></td><td class='value-good'>1.72</td><td class='value-good'>1.74</td><td class='value-good'>1.63</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/high-level/event_related/individual_subjects/sub-102_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Control">
+                <td><strong>215</strong></td>
+                <td>Control</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-warn">0.428%</td>
+                <td><table class='mini-table'><tr><th></th><th>LSF</th><th>NSF</th><th>HSF</th></tr><tr><td><strong>Face</strong></td><td class='value-bad'>-1.37</td><td class='value-bad'>-1.03</td><td class='value-bad'>-1.17</td></tr><tr><td><strong>Body</strong></td><td class='value-good'>1.52</td><td class='value-good'>0.78</td><td class='value-good'>2.04</td></tr><tr><td><strong>House</strong></td><td class='value-good'>0.54</td><td class='value-good'>1.57</td><td class='value-good'>0.99</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/high-level/event_related/individual_subjects/sub-215_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Control">
+                <td><strong>218</strong></td>
+                <td>Control</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-warn">0.188%</td>
+                <td><table class='mini-table'><tr><th></th><th>LSF</th><th>NSF</th><th>HSF</th></tr><tr><td><strong>Face</strong></td><td class='value-bad'>-0.11</td><td class='value-bad'>-0.02</td><td class='value-good'>0.48</td></tr><tr><td><strong>Body</strong></td><td class='value-bad'>-0.40</td><td class='value-good'>0.72</td><td class='value-good'>0.33</td></tr><tr><td><strong>House</strong></td><td class='value-good'>0.11</td><td class='value-good'>0.25</td><td class='value-good'>0.35</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/high-level/event_related/individual_subjects/sub-218_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Control">
+                <td><strong>219</strong></td>
+                <td>Control</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">0.807%</td>
+                <td><table class='mini-table'><tr><th></th><th>LSF</th><th>NSF</th><th>HSF</th></tr><tr><td><strong>Face</strong></td><td class='value-good'>0.38</td><td class='value-good'>1.07</td><td class='value-good'>0.45</td></tr><tr><td><strong>Body</strong></td><td class='value-bad'>-1.59</td><td class='value-good'>0.57</td><td class='value-good'>1.36</td></tr><tr><td><strong>House</strong></td><td class='value-good'>0.83</td><td class='value-good'>1.65</td><td class='value-good'>2.54</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/high-level/event_related/individual_subjects/sub-219_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Control">
+                <td><strong>220</strong></td>
+                <td>Control</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">0.804%</td>
+                <td><table class='mini-table'><tr><th></th><th>LSF</th><th>NSF</th><th>HSF</th></tr><tr><td><strong>Face</strong></td><td class='value-good'>0.07</td><td class='value-good'>2.02</td><td class='value-good'>0.73</td></tr><tr><td><strong>Body</strong></td><td class='value-good'>0.22</td><td class='value-good'>0.31</td><td class='value-good'>0.16</td></tr><tr><td><strong>House</strong></td><td class='value-good'>0.13</td><td class='value-good'>2.28</td><td class='value-good'>1.32</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/high-level/event_related/individual_subjects/sub-220_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Control">
+                <td><strong>221</strong></td>
+                <td>Control</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">1.297%</td>
+                <td><table class='mini-table'><tr><th></th><th>LSF</th><th>NSF</th><th>HSF</th></tr><tr><td><strong>Face</strong></td><td class='value-good'>0.39</td><td class='value-good'>1.15</td><td class='value-good'>1.29</td></tr><tr><td><strong>Body</strong></td><td class='value-good'>1.13</td><td class='value-good'>1.19</td><td class='value-good'>1.52</td></tr><tr><td><strong>House</strong></td><td class='value-good'>1.64</td><td class='value-good'>1.58</td><td class='value-good'>1.78</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/high-level/event_related/individual_subjects/sub-221_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Control">
+                <td><strong>222</strong></td>
+                <td>Control</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">0.709%</td>
+                <td><table class='mini-table'><tr><th></th><th>LSF</th><th>NSF</th><th>HSF</th></tr><tr><td><strong>Face</strong></td><td class='value-good'>1.25</td><td class='value-good'>0.60</td><td class='value-good'>0.91</td></tr><tr><td><strong>Body</strong></td><td class='value-good'>0.69</td><td class='value-good'>0.65</td><td class='value-good'>0.64</td></tr><tr><td><strong>House</strong></td><td class='value-good'>0.09</td><td class='value-good'>1.09</td><td class='value-good'>0.46</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/high-level/event_related/individual_subjects/sub-222_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Control">
+                <td><strong>223</strong></td>
+                <td>Control</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-warn">0.135%</td>
+                <td><table class='mini-table'><tr><th></th><th>LSF</th><th>NSF</th><th>HSF</th></tr><tr><td><strong>Face</strong></td><td class='value-bad'>-1.04</td><td class='value-bad'>-0.96</td><td class='value-bad'>-0.32</td></tr><tr><td><strong>Body</strong></td><td class='value-good'>1.03</td><td class='value-good'>1.57</td><td class='value-good'>1.42</td></tr><tr><td><strong>House</strong></td><td class='value-good'>0.01</td><td class='value-good'>0.55</td><td class='value-bad'>-1.04</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/high-level/event_related/individual_subjects/sub-223_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Control">
+                <td><strong>224</strong></td>
+                <td>Control</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">1.154%</td>
+                <td><table class='mini-table'><tr><th></th><th>LSF</th><th>NSF</th><th>HSF</th></tr><tr><td><strong>Face</strong></td><td class='value-good'>0.86</td><td class='value-good'>1.53</td><td class='value-good'>1.02</td></tr><tr><td><strong>Body</strong></td><td class='value-good'>1.25</td><td class='value-good'>1.09</td><td class='value-good'>1.29</td></tr><tr><td><strong>House</strong></td><td class='value-good'>1.01</td><td class='value-good'>0.60</td><td class='value-good'>1.72</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/high-level/event_related/individual_subjects/sub-224_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Control">
+                <td><strong>225</strong></td>
+                <td>Control</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">0.586%</td>
+                <td><table class='mini-table'><tr><th></th><th>LSF</th><th>NSF</th><th>HSF</th></tr><tr><td><strong>Face</strong></td><td class='value-good'>0.11</td><td class='value-good'>0.09</td><td class='value-good'>0.33</td></tr><tr><td><strong>Body</strong></td><td class='value-good'>0.09</td><td class='value-good'>0.27</td><td class='value-good'>0.41</td></tr><tr><td><strong>House</strong></td><td class='value-good'>0.73</td><td class='value-good'>1.59</td><td class='value-good'>1.67</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/high-level/event_related/individual_subjects/sub-225_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Control">
+                <td><strong>227</strong></td>
+                <td>Control</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">0.665%</td>
+                <td><table class='mini-table'><tr><th></th><th>LSF</th><th>NSF</th><th>HSF</th></tr><tr><td><strong>Face</strong></td><td class='value-bad'>-0.13</td><td class='value-bad'>-0.03</td><td class='value-good'>0.30</td></tr><tr><td><strong>Body</strong></td><td class='value-good'>1.19</td><td class='value-good'>1.37</td><td class='value-good'>1.41</td></tr><tr><td><strong>House</strong></td><td class='value-good'>0.42</td><td class='value-good'>0.65</td><td class='value-good'>0.80</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/high-level/event_related/individual_subjects/sub-227_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Control">
+                <td><strong>214</strong></td>
+                <td>Control</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">0.802%</td>
+                <td><table class='mini-table'><tr><th></th><th>LSF</th><th>NSF</th><th>HSF</th></tr><tr><td><strong>Face</strong></td><td class='value-bad'>-0.58</td><td class='value-bad'>-0.18</td><td class='value-good'>0.12</td></tr><tr><td><strong>Body</strong></td><td class='value-good'>0.71</td><td class='value-good'>1.25</td><td class='value-good'>1.49</td></tr><tr><td><strong>House</strong></td><td class='value-good'>1.29</td><td class='value-good'>1.62</td><td class='value-good'>1.50</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/high-level/event_related/individual_subjects/sub-214_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Control">
+                <td><strong>205</strong></td>
+                <td>Control</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">2.020%</td>
+                <td><table class='mini-table'><tr><th></th><th>LSF</th><th>NSF</th><th>HSF</th></tr><tr><td><strong>Face</strong></td><td class='value-good'>2.02</td><td class='value-good'>1.23</td><td class='value-good'>2.01</td></tr><tr><td><strong>Body</strong></td><td class='value-good'>2.13</td><td class='value-good'>1.05</td><td class='value-good'>3.29</td></tr><tr><td><strong>House</strong></td><td class='value-good'>1.73</td><td class='value-good'>2.15</td><td class='value-good'>2.58</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/high-level/event_related/individual_subjects/sub-205_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Patient">
+                <td><strong>131</strong></td>
+                <td>Patient</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">0.884%</td>
+                <td><table class='mini-table'><tr><th></th><th>LSF</th><th>NSF</th><th>HSF</th></tr><tr><td><strong>Face</strong></td><td class='value-bad'>-0.26</td><td class='value-good'>0.74</td><td class='value-good'>0.90</td></tr><tr><td><strong>Body</strong></td><td class='value-good'>0.58</td><td class='value-good'>0.58</td><td class='value-good'>0.55</td></tr><tr><td><strong>House</strong></td><td class='value-good'>1.45</td><td class='value-good'>1.67</td><td class='value-good'>1.74</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/high-level/event_related/individual_subjects/sub-131_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Control">
+                <td><strong>201</strong></td>
+                <td>Control</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-warn">0.353%</td>
+                <td><table class='mini-table'><tr><th></th><th>LSF</th><th>NSF</th><th>HSF</th></tr><tr><td><strong>Face</strong></td><td class='value-good'>0.64</td><td class='value-bad'>-1.19</td><td class='value-good'>0.97</td></tr><tr><td><strong>Body</strong></td><td class='value-bad'>-1.61</td><td class='value-bad'>-0.45</td><td class='value-bad'>-0.13</td></tr><tr><td><strong>House</strong></td><td class='value-good'>0.68</td><td class='value-good'>2.12</td><td class='value-good'>2.15</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/high-level/event_related/individual_subjects/sub-201_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Patient">
+                <td><strong>105</strong></td>
+                <td>Patient</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">0.611%</td>
+                <td><table class='mini-table'><tr><th></th><th>LSF</th><th>NSF</th><th>HSF</th></tr><tr><td><strong>Face</strong></td><td class='value-bad'>-2.95</td><td class='value-bad'>-2.73</td><td class='value-bad'>-1.34</td></tr><tr><td><strong>Body</strong></td><td class='value-good'>2.25</td><td class='value-good'>1.70</td><td class='value-good'>2.42</td></tr><tr><td><strong>House</strong></td><td class='value-good'>1.46</td><td class='value-good'>2.00</td><td class='value-good'>2.70</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/high-level/event_related/individual_subjects/sub-105_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Patient">
+                <td><strong>107</strong></td>
+                <td>Patient</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-warn">0.244%</td>
+                <td><table class='mini-table'><tr><th></th><th>LSF</th><th>NSF</th><th>HSF</th></tr><tr><td><strong>Face</strong></td><td class='value-bad'>-0.66</td><td class='value-good'>0.42</td><td class='value-good'>1.36</td></tr><tr><td><strong>Body</strong></td><td class='value-good'>0.65</td><td class='value-good'>0.16</td><td class='value-good'>0.30</td></tr><tr><td><strong>House</strong></td><td class='value-bad'>-0.42</td><td class='value-bad'>-0.26</td><td class='value-good'>0.65</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/high-level/event_related/individual_subjects/sub-107_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Patient">
+                <td><strong>108</strong></td>
+                <td>Patient</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">1.026%</td>
+                <td><table class='mini-table'><tr><th></th><th>LSF</th><th>NSF</th><th>HSF</th></tr><tr><td><strong>Face</strong></td><td class='value-good'>0.31</td><td class='value-bad'>-0.02</td><td class='value-good'>0.44</td></tr><tr><td><strong>Body</strong></td><td class='value-good'>0.61</td><td class='value-good'>1.46</td><td class='value-good'>1.38</td></tr><tr><td><strong>House</strong></td><td class='value-good'>1.24</td><td class='value-good'>2.20</td><td class='value-good'>1.62</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/high-level/event_related/individual_subjects/sub-108_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Patient">
+                <td><strong>109</strong></td>
+                <td>Patient</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-warn">0.231%</td>
+                <td><table class='mini-table'><tr><th></th><th>LSF</th><th>NSF</th><th>HSF</th></tr><tr><td><strong>Face</strong></td><td class='value-bad'>-1.58</td><td class='value-bad'>-0.86</td><td class='value-bad'>-0.40</td></tr><tr><td><strong>Body</strong></td><td class='value-good'>0.95</td><td class='value-good'>1.03</td><td class='value-good'>1.21</td></tr><tr><td><strong>House</strong></td><td class='value-good'>0.82</td><td class='value-good'>0.35</td><td class='value-good'>0.58</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/high-level/event_related/individual_subjects/sub-109_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Patient">
+                <td><strong>110</strong></td>
+                <td>Patient</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">1.148%</td>
+                <td><table class='mini-table'><tr><th></th><th>LSF</th><th>NSF</th><th>HSF</th></tr><tr><td><strong>Face</strong></td><td class='value-good'>0.65</td><td class='value-good'>0.62</td><td class='value-good'>1.56</td></tr><tr><td><strong>Body</strong></td><td class='value-good'>1.41</td><td class='value-bad'>-0.06</td><td class='value-good'>2.07</td></tr><tr><td><strong>House</strong></td><td class='value-good'>0.92</td><td class='value-good'>1.16</td><td class='value-good'>2.00</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/high-level/event_related/individual_subjects/sub-110_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Patient">
+                <td><strong>111</strong></td>
+                <td>Patient</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-warn">0.223%</td>
+                <td><table class='mini-table'><tr><th></th><th>LSF</th><th>NSF</th><th>HSF</th></tr><tr><td><strong>Face</strong></td><td class='value-good'>0.71</td><td class='value-good'>1.02</td><td class='value-good'>1.27</td></tr><tr><td><strong>Body</strong></td><td class='value-bad'>-1.28</td><td class='value-bad'>-0.47</td><td class='value-bad'>-0.83</td></tr><tr><td><strong>House</strong></td><td class='value-good'>0.49</td><td class='value-good'>0.62</td><td class='value-good'>0.48</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/high-level/event_related/individual_subjects/sub-111_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Patient">
+                <td><strong>112</strong></td>
+                <td>Patient</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">1.592%</td>
+                <td><table class='mini-table'><tr><th></th><th>LSF</th><th>NSF</th><th>HSF</th></tr><tr><td><strong>Face</strong></td><td class='value-good'>0.84</td><td class='value-good'>1.17</td><td class='value-good'>2.15</td></tr><tr><td><strong>Body</strong></td><td class='value-good'>1.60</td><td class='value-good'>1.83</td><td class='value-good'>1.72</td></tr><tr><td><strong>House</strong></td><td class='value-good'>0.92</td><td class='value-good'>1.98</td><td class='value-good'>2.11</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/high-level/event_related/individual_subjects/sub-112_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Patient">
+                <td><strong>113</strong></td>
+                <td>Patient</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">0.705%</td>
+                <td><table class='mini-table'><tr><th></th><th>LSF</th><th>NSF</th><th>HSF</th></tr><tr><td><strong>Face</strong></td><td class='value-bad'>-0.12</td><td class='value-bad'>-1.41</td><td class='value-bad'>-0.50</td></tr><tr><td><strong>Body</strong></td><td class='value-good'>2.19</td><td class='value-bad'>-0.13</td><td class='value-good'>0.67</td></tr><tr><td><strong>House</strong></td><td class='value-good'>1.40</td><td class='value-good'>1.90</td><td class='value-good'>2.34</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/high-level/event_related/individual_subjects/sub-113_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Patient">
+                <td><strong>115</strong></td>
+                <td>Patient</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">0.699%</td>
+                <td><table class='mini-table'><tr><th></th><th>LSF</th><th>NSF</th><th>HSF</th></tr><tr><td><strong>Face</strong></td><td class='value-good'>1.68</td><td class='value-good'>1.65</td><td class='value-good'>2.44</td></tr><tr><td><strong>Body</strong></td><td class='value-bad'>-1.26</td><td class='value-bad'>-0.22</td><td class='value-bad'>-0.19</td></tr><tr><td><strong>House</strong></td><td class='value-good'>0.07</td><td class='value-good'>1.07</td><td class='value-good'>1.04</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/high-level/event_related/individual_subjects/sub-115_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Patient">
+                <td><strong>116</strong></td>
+                <td>Patient</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">0.901%</td>
+                <td><table class='mini-table'><tr><th></th><th>LSF</th><th>NSF</th><th>HSF</th></tr><tr><td><strong>Face</strong></td><td class='value-good'>0.36</td><td class='value-good'>0.85</td><td class='value-good'>0.74</td></tr><tr><td><strong>Body</strong></td><td class='value-good'>1.28</td><td class='value-good'>1.15</td><td class='value-good'>1.17</td></tr><tr><td><strong>House</strong></td><td class='value-good'>1.06</td><td class='value-good'>0.59</td><td class='value-good'>0.92</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/high-level/event_related/individual_subjects/sub-116_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Patient">
+                <td><strong>117</strong></td>
+                <td>Patient</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-warn">0.399%</td>
+                <td><table class='mini-table'><tr><th></th><th>LSF</th><th>NSF</th><th>HSF</th></tr><tr><td><strong>Face</strong></td><td class='value-good'>0.62</td><td class='value-good'>0.78</td><td class='value-good'>1.31</td></tr><tr><td><strong>Body</strong></td><td class='value-good'>1.75</td><td class='value-bad'>-0.33</td><td class='value-good'>0.92</td></tr><tr><td><strong>House</strong></td><td class='value-bad'>-0.39</td><td class='value-bad'>-0.57</td><td class='value-bad'>-0.50</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/high-level/event_related/individual_subjects/sub-117_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Patient">
+                <td><strong>118</strong></td>
+                <td>Patient</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">0.715%</td>
+                <td><table class='mini-table'><tr><th></th><th>LSF</th><th>NSF</th><th>HSF</th></tr><tr><td><strong>Face</strong></td><td class='value-good'>0.66</td><td class='value-good'>0.33</td><td class='value-good'>0.00</td></tr><tr><td><strong>Body</strong></td><td class='value-good'>2.43</td><td class='value-good'>1.57</td><td class='value-good'>0.99</td></tr><tr><td><strong>House</strong></td><td class='value-bad'>-0.53</td><td class='value-good'>0.85</td><td class='value-good'>0.13</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/high-level/event_related/individual_subjects/sub-118_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Patient">
+                <td><strong>120</strong></td>
+                <td>Patient</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">0.662%</td>
+                <td><table class='mini-table'><tr><th></th><th>LSF</th><th>NSF</th><th>HSF</th></tr><tr><td><strong>Face</strong></td><td class='value-good'>1.57</td><td class='value-bad'>-0.24</td><td class='value-good'>1.29</td></tr><tr><td><strong>Body</strong></td><td class='value-bad'>-0.24</td><td class='value-good'>0.68</td><td class='value-bad'>-0.94</td></tr><tr><td><strong>House</strong></td><td class='value-good'>0.94</td><td class='value-good'>1.59</td><td class='value-good'>1.31</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/high-level/event_related/individual_subjects/sub-120_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Patient">
+                <td><strong>121</strong></td>
+                <td>Patient</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">1.409%</td>
+                <td><table class='mini-table'><tr><th></th><th>LSF</th><th>NSF</th><th>HSF</th></tr><tr><td><strong>Face</strong></td><td class='value-good'>1.65</td><td class='value-good'>0.10</td><td class='value-good'>2.33</td></tr><tr><td><strong>Body</strong></td><td class='value-good'>0.15</td><td class='value-good'>1.28</td><td class='value-good'>2.08</td></tr><tr><td><strong>House</strong></td><td class='value-good'>0.98</td><td class='value-good'>1.85</td><td class='value-good'>2.25</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/high-level/event_related/individual_subjects/sub-121_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Patient">
+                <td><strong>122</strong></td>
+                <td>Patient</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-warn">0.287%</td>
+                <td><table class='mini-table'><tr><th></th><th>LSF</th><th>NSF</th><th>HSF</th></tr><tr><td><strong>Face</strong></td><td class='value-good'>0.39</td><td class='value-bad'>-0.81</td><td class='value-good'>1.26</td></tr><tr><td><strong>Body</strong></td><td class='value-good'>0.35</td><td class='value-good'>0.36</td><td class='value-good'>1.10</td></tr><tr><td><strong>House</strong></td><td class='value-good'>1.44</td><td class='value-bad'>-0.17</td><td class='value-bad'>-1.35</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/high-level/event_related/individual_subjects/sub-122_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Patient">
+                <td><strong>125</strong></td>
+                <td>Patient</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">0.695%</td>
+                <td><table class='mini-table'><tr><th></th><th>LSF</th><th>NSF</th><th>HSF</th></tr><tr><td><strong>Face</strong></td><td class='value-good'>0.71</td><td class='value-good'>0.75</td><td class='value-good'>0.80</td></tr><tr><td><strong>Body</strong></td><td class='value-good'>0.75</td><td class='value-good'>0.62</td><td class='value-good'>0.56</td></tr><tr><td><strong>House</strong></td><td class='value-good'>1.42</td><td class='value-good'>0.12</td><td class='value-good'>0.52</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/high-level/event_related/individual_subjects/sub-125_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Patient">
+                <td><strong>126</strong></td>
+                <td>Patient</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-warn">0.369%</td>
+                <td><table class='mini-table'><tr><th></th><th>LSF</th><th>NSF</th><th>HSF</th></tr><tr><td><strong>Face</strong></td><td class='value-good'>0.13</td><td class='value-bad'>-0.35</td><td class='value-good'>0.62</td></tr><tr><td><strong>Body</strong></td><td class='value-good'>0.11</td><td class='value-good'>0.08</td><td class='value-good'>0.66</td></tr><tr><td><strong>House</strong></td><td class='value-good'>0.37</td><td class='value-good'>0.99</td><td class='value-good'>0.71</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/high-level/event_related/individual_subjects/sub-126_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Patient">
+                <td><strong>128</strong></td>
+                <td>Patient</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">0.574%</td>
+                <td><table class='mini-table'><tr><th></th><th>LSF</th><th>NSF</th><th>HSF</th></tr><tr><td><strong>Face</strong></td><td class='value-good'>1.75</td><td class='value-good'>0.64</td><td class='value-bad'>-0.69</td></tr><tr><td><strong>Body</strong></td><td class='value-good'>1.05</td><td class='value-good'>0.33</td><td class='value-good'>0.23</td></tr><tr><td><strong>House</strong></td><td class='value-good'>1.42</td><td class='value-good'>0.06</td><td class='value-good'>0.37</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/high-level/event_related/individual_subjects/sub-128_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Patient">
+                <td><strong>129</strong></td>
+                <td>Patient</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">0.975%</td>
+                <td><table class='mini-table'><tr><th></th><th>LSF</th><th>NSF</th><th>HSF</th></tr><tr><td><strong>Face</strong></td><td class='value-good'>0.55</td><td class='value-good'>0.73</td><td class='value-good'>1.54</td></tr><tr><td><strong>Body</strong></td><td class='value-good'>0.31</td><td class='value-good'>0.44</td><td class='value-good'>1.51</td></tr><tr><td><strong>House</strong></td><td class='value-good'>1.04</td><td class='value-good'>1.24</td><td class='value-good'>1.40</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/high-level/event_related/individual_subjects/sub-129_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Patient">
+                <td><strong>130</strong></td>
+                <td>Patient</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">1.454%</td>
+                <td><table class='mini-table'><tr><th></th><th>LSF</th><th>NSF</th><th>HSF</th></tr><tr><td><strong>Face</strong></td><td class='value-good'>1.02</td><td class='value-good'>0.46</td><td class='value-good'>1.09</td></tr><tr><td><strong>Body</strong></td><td class='value-good'>1.42</td><td class='value-good'>0.89</td><td class='value-good'>2.09</td></tr><tr><td><strong>House</strong></td><td class='value-good'>2.03</td><td class='value-good'>1.90</td><td class='value-good'>2.18</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/high-level/event_related/individual_subjects/sub-130_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Control">
+                <td><strong>229</strong></td>
+                <td>Control</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-warn">0.331%</td>
+                <td><table class='mini-table'><tr><th></th><th>LSF</th><th>NSF</th><th>HSF</th></tr><tr><td><strong>Face</strong></td><td class='value-bad'>-0.30</td><td class='value-good'>0.75</td><td class='value-bad'>-0.02</td></tr><tr><td><strong>Body</strong></td><td class='value-good'>0.25</td><td class='value-good'>0.20</td><td class='value-good'>0.54</td></tr><tr><td><strong>House</strong></td><td class='value-good'>0.16</td><td class='value-good'>0.60</td><td class='value-good'>0.81</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/high-level/event_related/individual_subjects/sub-229_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Control">
+                <td><strong>204</strong></td>
+                <td>Control</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">0.762%</td>
+                <td><table class='mini-table'><tr><th></th><th>LSF</th><th>NSF</th><th>HSF</th></tr><tr><td><strong>Face</strong></td><td class='value-bad'>-0.10</td><td class='value-good'>1.14</td><td class='value-good'>1.46</td></tr><tr><td><strong>Body</strong></td><td class='value-good'>0.76</td><td class='value-good'>1.76</td><td class='value-good'>1.39</td></tr><tr><td><strong>House</strong></td><td class='value-bad'>-0.11</td><td class='value-good'>0.01</td><td class='value-good'>0.54</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/high-level/event_related/individual_subjects/sub-204_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Control">
+                <td><strong>230</strong></td>
+                <td>Control</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-warn">0.106%</td>
+                <td><table class='mini-table'><tr><th></th><th>LSF</th><th>NSF</th><th>HSF</th></tr><tr><td><strong>Face</strong></td><td class='value-bad'>-0.43</td><td class='value-bad'>-1.56</td><td class='value-bad'>-0.05</td></tr><tr><td><strong>Body</strong></td><td class='value-good'>0.04</td><td class='value-good'>1.19</td><td class='value-good'>0.52</td></tr><tr><td><strong>House</strong></td><td class='value-good'>0.28</td><td class='value-good'>0.75</td><td class='value-good'>0.23</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/high-level/event_related/individual_subjects/sub-230_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+        </tbody>
+    </table>
+    
+    <div id="imageModal" class="modal" onclick="closeModal()">
+        <span class="close">&times;</span>
+        <img class="modal-content" id="modalImage">
+    </div>
+    
+    <script>
+        function openModal(src) {
+            document.getElementById('imageModal').style.display = 'block';
+            document.getElementById('modalImage').src = src;
+        }
+        
+        function closeModal() {
+            document.getElementById('imageModal').style.display = 'none';
+        }
+        
+        function filterTable(filter) {
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            const rows = document.querySelectorAll('#qcTable tbody tr');
+            rows.forEach(row => {
+                if (filter === 'ALL') {
+                    row.style.display = '';
+                } else if (filter === 'FAIL' || filter === 'WARN' || filter === 'PASS') {
+                    row.style.display = row.dataset.status === filter ? '' : 'none';
+                } else if (filter === 'Patient' || filter === 'Control') {
+                    row.style.display = row.dataset.group === filter ? '' : 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,957 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Low-Level Task QC Report</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+            border-bottom: 3px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #555;
+            margin-top: 30px;
+        }
+        .summary-box {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .stat-card.patients {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        .stat-card.controls {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            position: sticky;
+            top: 0;
+        }
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        .status-PASS {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .status-WARN {
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .status-FAIL {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .thumbnail {
+            max-width: 150px;
+            cursor: pointer;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            transition: transform 0.2s;
+        }
+        .thumbnail:hover {
+            transform: scale(1.05);
+            border-color: #4CAF50;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.9);
+        }
+        .modal-content {
+            margin: auto;
+            display: block;
+            max-width: 90%;
+            max-height: 90%;
+            margin-top: 2%;
+        }
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 35px;
+            color: #f1f1f1;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .value-good {
+            color: #155724;
+            font-weight: bold;
+        }
+        .value-warn {
+            color: #856404;
+            font-weight: bold;
+        }
+        .value-bad {
+            color: #721c24;
+            font-weight: bold;
+        }
+        .filter-buttons {
+            margin: 20px 0;
+        }
+        .filter-btn {
+            padding: 10px 20px;
+            margin-right: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .filter-btn.active {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .filter-btn:not(.active) {
+            background-color: #ddd;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔬 Low-Level Task Quality Control Report</h1>
+    
+    <div class="summary-box">
+        <h2>Summary Statistics</h2>
+        <div class="summary-stats">
+            <div class="stat-card">
+                <div class="stat-label">Total Subjects</div>
+                <div class="stat-value">57</div>
+            </div>
+            <div class="stat-card patients">
+                <div class="stat-label">Patients</div>
+                <div class="stat-value">29</div>
+            </div>
+            <div class="stat-card controls">
+                <div class="stat-label">Controls</div>
+                <div class="stat-value">28</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">QC PASS</div>
+                <div class="stat-value">47</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">QC WARN</div>
+                <div class="stat-value">8</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">QC FAIL</div>
+                <div class="stat-value">2</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="summary-box">
+        <h2>Mean Response Statistics</h2>
+        <p><strong>Overall Mean Response:</strong> 0.481% (SD = 0.339%)</p>
+        <p><strong>Patients Mean:</strong> 0.512% | <strong>Controls Mean:</strong> 0.448%</p>
+        <p><strong>Mean Functional V1:</strong> 46.1% of anatomical V1</p>
+    </div>
+    
+    <div class="filter-buttons">
+        <button class="filter-btn active" onclick="filterTable('ALL')">Show All</button>
+        <button class="filter-btn" onclick="filterTable('FAIL')">Show FAIL Only</button>
+        <button class="filter-btn" onclick="filterTable('WARN')">Show WARN Only</button>
+        <button class="filter-btn" onclick="filterTable('PASS')">Show PASS Only</button>
+        <button class="filter-btn" onclick="filterTable('Patient')">Patients Only</button>
+        <button class="filter-btn" onclick="filterTable('Control')">Controls Only</button>
+    </div>
+    
+    <h2>Individual Subject Details</h2>
+    <table id="qcTable">
+        <thead>
+            <tr>
+                <th>Subject</th>
+                <th>Group</th>
+                <th>QC Status</th>
+                <th>Flags</th>
+                <th>Functional V1 %</th>
+                <th>Mean Response (%)</th>
+                <th>Condition Responses</th>
+                <th>ROI Visualization</th>
+                <th>Event-Related Plot</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            <tr data-status="FAIL" data-group="Patient">
+                <td><strong>105</strong></td>
+                <td>Patient</td>
+                <td><span class="status-FAIL">FAIL</span></td>
+                <td>Low functional V1</td>
+                <td class="value-bad">2.5%</td>
+                <td class="value-warn">0.410%</td>
+                <td><table style='font-size: 11px; margin: 0;'><tr><td>low-high</td><td class='value-good'>0.27% / 1.10%</td></tr><tr><td>high-high</td><td class='value-good'>0.77% / 1.78%</td></tr><tr><td>low-low</td><td class='value-good'>0.43% / 0.71%</td></tr><tr><td>high-low</td><td class='value-good'>0.17% / 0.54%</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/roi_visualizations/sub-105_functional_V1.png" class="thumbnail" onclick="openModal(this.src)"></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/event_related/individual_subjects/sub-105_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="FAIL" data-group="Patient">
+                <td><strong>127</strong></td>
+                <td>Patient</td>
+                <td><span class="status-FAIL">FAIL</span></td>
+                <td>Inverted response</td>
+                <td class="value-good">49.4%</td>
+                <td class="value-bad">-0.117%</td>
+                <td><table style='font-size: 11px; margin: 0;'><tr><td>low-high</td><td class='value-bad'>-0.36% / 0.38%</td></tr><tr><td>high-high</td><td class='value-bad'>-0.27% / 0.77%</td></tr><tr><td>low-low</td><td class='value-good'>0.31% / 0.66%</td></tr><tr><td>high-low</td><td class='value-bad'>-0.14% / 0.42%</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/roi_visualizations/sub-127_functional_V1.png" class="thumbnail" onclick="openModal(this.src)"></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/event_related/individual_subjects/sub-127_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="WARN" data-group="Control">
+                <td><strong>228</strong></td>
+                <td>Control</td>
+                <td><span class="status-WARN">WARN</span></td>
+                <td>Weak response</td>
+                <td class="value-good">60.4%</td>
+                <td class="value-warn">0.044%</td>
+                <td><table style='font-size: 11px; margin: 0;'><tr><td>low-high</td><td class='value-good'>0.14% / 0.68%</td></tr><tr><td>high-high</td><td class='value-good'>0.07% / 1.42%</td></tr><tr><td>low-low</td><td class='value-bad'>-0.08% / 0.20%</td></tr><tr><td>high-low</td><td class='value-good'>0.04% / 0.91%</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/roi_visualizations/sub-228_functional_V1.png" class="thumbnail" onclick="openModal(this.src)"></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/event_related/individual_subjects/sub-228_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="WARN" data-group="Control">
+                <td><strong>226</strong></td>
+                <td>Control</td>
+                <td><span class="status-WARN">WARN</span></td>
+                <td>Inverted response, Weak response</td>
+                <td class="value-good">59.0%</td>
+                <td class="value-bad">-0.098%</td>
+                <td><table style='font-size: 11px; margin: 0;'><tr><td>low-high</td><td class='value-bad'>-0.16% / 0.28%</td></tr><tr><td>high-high</td><td class='value-good'>0.74% / 1.83%</td></tr><tr><td>low-low</td><td class='value-bad'>-0.65% / -0.26%</td></tr><tr><td>high-low</td><td class='value-bad'>-0.33% / -0.17%</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/roi_visualizations/sub-226_functional_V1.png" class="thumbnail" onclick="openModal(this.src)"></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/event_related/individual_subjects/sub-226_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="WARN" data-group="Control">
+                <td><strong>207</strong></td>
+                <td>Control</td>
+                <td><span class="status-WARN">WARN</span></td>
+                <td>Inverted response, Weak response</td>
+                <td class="value-good">47.6%</td>
+                <td class="value-bad">-0.054%</td>
+                <td><table style='font-size: 11px; margin: 0;'><tr><td>low-high</td><td class='value-good'>0.10% / 0.53%</td></tr><tr><td>high-high</td><td class='value-good'>0.25% / 1.15%</td></tr><tr><td>low-low</td><td class='value-bad'>-0.32% / 0.09%</td></tr><tr><td>high-low</td><td class='value-bad'>-0.25% / 0.37%</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/roi_visualizations/sub-207_functional_V1.png" class="thumbnail" onclick="openModal(this.src)"></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/event_related/individual_subjects/sub-207_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="WARN" data-group="Patient">
+                <td><strong>125</strong></td>
+                <td>Patient</td>
+                <td><span class="status-WARN">WARN</span></td>
+                <td>Weak response</td>
+                <td class="value-good">40.8%</td>
+                <td class="value-warn">0.035%</td>
+                <td><table style='font-size: 11px; margin: 0;'><tr><td>low-high</td><td class='value-bad'>-0.17% / 0.07%</td></tr><tr><td>high-high</td><td class='value-good'>0.42% / 0.96%</td></tr><tr><td>low-low</td><td class='value-bad'>-0.13% / 0.15%</td></tr><tr><td>high-low</td><td class='value-good'>0.02% / 0.42%</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/roi_visualizations/sub-125_functional_V1.png" class="thumbnail" onclick="openModal(this.src)"></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/event_related/individual_subjects/sub-125_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="WARN" data-group="Control">
+                <td><strong>210</strong></td>
+                <td>Control</td>
+                <td><span class="status-WARN">WARN</span></td>
+                <td>Weak response</td>
+                <td class="value-good">55.8%</td>
+                <td class="value-warn">0.020%</td>
+                <td><table style='font-size: 11px; margin: 0;'><tr><td>low-high</td><td class='value-bad'>-0.26% / 0.32%</td></tr><tr><td>high-high</td><td class='value-good'>0.62% / 2.07%</td></tr><tr><td>low-low</td><td class='value-bad'>-0.68% / -0.29%</td></tr><tr><td>high-low</td><td class='value-good'>0.39% / 0.99%</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/roi_visualizations/sub-210_functional_V1.png" class="thumbnail" onclick="openModal(this.src)"></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/event_related/individual_subjects/sub-210_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="WARN" data-group="Patient">
+                <td><strong>123</strong></td>
+                <td>Patient</td>
+                <td><span class="status-WARN">WARN</span></td>
+                <td>Inverted response, Weak response</td>
+                <td class="value-good">50.3%</td>
+                <td class="value-bad">-0.083%</td>
+                <td><table style='font-size: 11px; margin: 0;'><tr><td>low-high</td><td class='value-good'>0.16% / 0.80%</td></tr><tr><td>high-high</td><td class='value-good'>0.34% / 1.76%</td></tr><tr><td>low-low</td><td class='value-bad'>-0.16% / 0.41%</td></tr><tr><td>high-low</td><td class='value-bad'>-0.68% / -0.35%</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/roi_visualizations/sub-123_functional_V1.png" class="thumbnail" onclick="openModal(this.src)"></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/event_related/individual_subjects/sub-123_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="WARN" data-group="Control">
+                <td><strong>212</strong></td>
+                <td>Control</td>
+                <td><span class="status-WARN">WARN</span></td>
+                <td>Low functional V1, Inverted response, Weak response</td>
+                <td class="value-bad">7.6%</td>
+                <td class="value-bad">-0.045%</td>
+                <td><table style='font-size: 11px; margin: 0;'><tr><td>low-high</td><td class='value-bad'>-0.51% / -0.19%</td></tr><tr><td>high-high</td><td class='value-good'>0.15% / 0.75%</td></tr><tr><td>low-low</td><td class='value-good'>0.01% / 0.41%</td></tr><tr><td>high-low</td><td class='value-good'>0.17% / 0.59%</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/roi_visualizations/sub-212_functional_V1.png" class="thumbnail" onclick="openModal(this.src)"></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/event_related/individual_subjects/sub-212_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="WARN" data-group="Patient">
+                <td><strong>119</strong></td>
+                <td>Patient</td>
+                <td><span class="status-WARN">WARN</span></td>
+                <td>Weak response</td>
+                <td class="value-good">61.9%</td>
+                <td class="value-warn">0.031%</td>
+                <td><table style='font-size: 11px; margin: 0;'><tr><td>low-high</td><td class='value-bad'>-0.65% / -0.11%</td></tr><tr><td>high-high</td><td class='value-good'>0.29% / 1.65%</td></tr><tr><td>low-low</td><td class='value-bad'>-0.19% / 0.38%</td></tr><tr><td>high-low</td><td class='value-good'>0.68% / 1.73%</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/roi_visualizations/sub-119_functional_V1.png" class="thumbnail" onclick="openModal(this.src)"></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/event_related/individual_subjects/sub-119_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Patient">
+                <td><strong>102</strong></td>
+                <td>Patient</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">55.4%</td>
+                <td class="value-good">0.989%</td>
+                <td><table style='font-size: 11px; margin: 0;'><tr><td>low-high</td><td class='value-good'>0.99% / 1.88%</td></tr><tr><td>high-high</td><td class='value-good'>1.82% / 3.21%</td></tr><tr><td>low-low</td><td class='value-good'>0.37% / 0.84%</td></tr><tr><td>high-low</td><td class='value-good'>0.78% / 1.44%</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/roi_visualizations/sub-102_functional_V1.png" class="thumbnail" onclick="openModal(this.src)"></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/event_related/individual_subjects/sub-102_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Control">
+                <td><strong>206</strong></td>
+                <td>Control</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">38.4%</td>
+                <td class="value-warn">0.391%</td>
+                <td><table style='font-size: 11px; margin: 0;'><tr><td>low-high</td><td class='value-good'>0.29% / 0.54%</td></tr><tr><td>high-high</td><td class='value-good'>0.86% / 1.81%</td></tr><tr><td>low-low</td><td class='value-bad'>-0.13% / 0.31%</td></tr><tr><td>high-low</td><td class='value-good'>0.54% / 1.25%</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/roi_visualizations/sub-206_functional_V1.png" class="thumbnail" onclick="openModal(this.src)"></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/event_related/individual_subjects/sub-206_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Control">
+                <td><strong>208</strong></td>
+                <td>Control</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">40.2%</td>
+                <td class="value-good">1.128%</td>
+                <td><table style='font-size: 11px; margin: 0;'><tr><td>low-high</td><td class='value-good'>1.23% / 1.99%</td></tr><tr><td>high-high</td><td class='value-good'>1.99% / 3.54%</td></tr><tr><td>low-low</td><td class='value-good'>0.77% / 1.49%</td></tr><tr><td>high-low</td><td class='value-good'>0.53% / 0.85%</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/roi_visualizations/sub-208_functional_V1.png" class="thumbnail" onclick="openModal(this.src)"></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/event_related/individual_subjects/sub-208_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Control">
+                <td><strong>209</strong></td>
+                <td>Control</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">24.8%</td>
+                <td class="value-warn">0.339%</td>
+                <td><table style='font-size: 11px; margin: 0;'><tr><td>low-high</td><td class='value-good'>0.53% / 0.87%</td></tr><tr><td>high-high</td><td class='value-good'>0.09% / 0.56%</td></tr><tr><td>low-low</td><td class='value-good'>0.03% / 0.47%</td></tr><tr><td>high-low</td><td class='value-good'>0.71% / 1.19%</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/roi_visualizations/sub-209_functional_V1.png" class="thumbnail" onclick="openModal(this.src)"></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/event_related/individual_subjects/sub-209_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Control">
+                <td><strong>211</strong></td>
+                <td>Control</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">29.1%</td>
+                <td class="value-warn">0.263%</td>
+                <td><table style='font-size: 11px; margin: 0;'><tr><td>low-high</td><td class='value-good'>0.01% / 0.28%</td></tr><tr><td>high-high</td><td class='value-good'>0.14% / 1.38%</td></tr><tr><td>low-low</td><td class='value-good'>0.54% / 0.95%</td></tr><tr><td>high-low</td><td class='value-good'>0.37% / 1.38%</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/roi_visualizations/sub-211_functional_V1.png" class="thumbnail" onclick="openModal(this.src)"></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/event_related/individual_subjects/sub-211_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Control">
+                <td><strong>213</strong></td>
+                <td>Control</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">52.8%</td>
+                <td class="value-good">0.543%</td>
+                <td><table style='font-size: 11px; margin: 0;'><tr><td>low-high</td><td class='value-good'>0.07% / 0.74%</td></tr><tr><td>high-high</td><td class='value-good'>1.04% / 2.49%</td></tr><tr><td>low-low</td><td class='value-good'>0.28% / 0.73%</td></tr><tr><td>high-low</td><td class='value-good'>0.77% / 1.47%</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/roi_visualizations/sub-213_functional_V1.png" class="thumbnail" onclick="openModal(this.src)"></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/event_related/individual_subjects/sub-213_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Control">
+                <td><strong>215</strong></td>
+                <td>Control</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">45.7%</td>
+                <td class="value-warn">0.480%</td>
+                <td><table style='font-size: 11px; margin: 0;'><tr><td>low-high</td><td class='value-good'>0.23% / 0.62%</td></tr><tr><td>high-high</td><td class='value-good'>1.09% / 2.12%</td></tr><tr><td>low-low</td><td class='value-good'>0.29% / 0.54%</td></tr><tr><td>high-low</td><td class='value-good'>0.31% / 0.90%</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/roi_visualizations/sub-215_functional_V1.png" class="thumbnail" onclick="openModal(this.src)"></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/event_related/individual_subjects/sub-215_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Control">
+                <td><strong>205</strong></td>
+                <td>Control</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">36.2%</td>
+                <td class="value-good">0.699%</td>
+                <td><table style='font-size: 11px; margin: 0;'><tr><td>low-high</td><td class='value-good'>0.87% / 1.42%</td></tr><tr><td>high-high</td><td class='value-good'>1.69% / 3.57%</td></tr><tr><td>low-low</td><td class='value-bad'>-0.07% / 0.15%</td></tr><tr><td>high-low</td><td class='value-good'>0.31% / 1.00%</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/roi_visualizations/sub-205_functional_V1.png" class="thumbnail" onclick="openModal(this.src)"></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/event_related/individual_subjects/sub-205_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Control">
+                <td><strong>217</strong></td>
+                <td>Control</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">36.9%</td>
+                <td class="value-warn">0.488%</td>
+                <td><table style='font-size: 11px; margin: 0;'><tr><td>low-high</td><td class='value-good'>1.28% / 1.56%</td></tr><tr><td>high-high</td><td class='value-good'>0.66% / 1.13%</td></tr><tr><td>low-low</td><td class='value-bad'>-0.07% / 0.02%</td></tr><tr><td>high-low</td><td class='value-good'>0.09% / 0.65%</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/roi_visualizations/sub-217_functional_V1.png" class="thumbnail" onclick="openModal(this.src)"></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/event_related/individual_subjects/sub-217_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Control">
+                <td><strong>218</strong></td>
+                <td>Control</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">52.6%</td>
+                <td class="value-good">0.646%</td>
+                <td><table style='font-size: 11px; margin: 0;'><tr><td>low-high</td><td class='value-good'>0.68% / 1.50%</td></tr><tr><td>high-high</td><td class='value-good'>1.21% / 2.36%</td></tr><tr><td>low-low</td><td class='value-good'>0.49% / 0.95%</td></tr><tr><td>high-low</td><td class='value-good'>0.20% / 0.56%</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/roi_visualizations/sub-218_functional_V1.png" class="thumbnail" onclick="openModal(this.src)"></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/event_related/individual_subjects/sub-218_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Control">
+                <td><strong>219</strong></td>
+                <td>Control</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">23.0%</td>
+                <td class="value-good">1.004%</td>
+                <td><table style='font-size: 11px; margin: 0;'><tr><td>low-high</td><td class='value-good'>0.68% / 0.93%</td></tr><tr><td>high-high</td><td class='value-good'>1.59% / 3.24%</td></tr><tr><td>low-low</td><td class='value-good'>1.26% / 1.88%</td></tr><tr><td>high-low</td><td class='value-good'>0.49% / 1.01%</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/roi_visualizations/sub-219_functional_V1.png" class="thumbnail" onclick="openModal(this.src)"></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/event_related/individual_subjects/sub-219_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Control">
+                <td><strong>220</strong></td>
+                <td>Control</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">56.6%</td>
+                <td class="value-warn">0.473%</td>
+                <td><table style='font-size: 11px; margin: 0;'><tr><td>low-high</td><td class='value-good'>0.24% / 0.70%</td></tr><tr><td>high-high</td><td class='value-good'>1.07% / 2.05%</td></tr><tr><td>low-low</td><td class='value-good'>0.27% / 0.72%</td></tr><tr><td>high-low</td><td class='value-good'>0.32% / 1.01%</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/roi_visualizations/sub-220_functional_V1.png" class="thumbnail" onclick="openModal(this.src)"></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/event_related/individual_subjects/sub-220_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Control">
+                <td><strong>221</strong></td>
+                <td>Control</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">42.4%</td>
+                <td class="value-good">0.845%</td>
+                <td><table style='font-size: 11px; margin: 0;'><tr><td>low-high</td><td class='value-good'>0.63% / 1.03%</td></tr><tr><td>high-high</td><td class='value-good'>1.20% / 1.88%</td></tr><tr><td>low-low</td><td class='value-good'>0.65% / 1.33%</td></tr><tr><td>high-low</td><td class='value-good'>0.90% / 1.47%</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/roi_visualizations/sub-221_functional_V1.png" class="thumbnail" onclick="openModal(this.src)"></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/event_related/individual_subjects/sub-221_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Control">
+                <td><strong>222</strong></td>
+                <td>Control</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">34.6%</td>
+                <td class="value-warn">0.499%</td>
+                <td><table style='font-size: 11px; margin: 0;'><tr><td>low-high</td><td class='value-bad'>-0.04% / 0.29%</td></tr><tr><td>high-high</td><td class='value-good'>0.69% / 1.68%</td></tr><tr><td>low-low</td><td class='value-good'>0.50% / 0.95%</td></tr><tr><td>high-low</td><td class='value-good'>0.84% / 1.52%</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/roi_visualizations/sub-222_functional_V1.png" class="thumbnail" onclick="openModal(this.src)"></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/event_related/individual_subjects/sub-222_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Control">
+                <td><strong>223</strong></td>
+                <td>Control</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">42.0%</td>
+                <td class="value-good">0.928%</td>
+                <td><table style='font-size: 11px; margin: 0;'><tr><td>low-high</td><td class='value-good'>0.50% / 1.08%</td></tr><tr><td>high-high</td><td class='value-good'>1.49% / 2.82%</td></tr><tr><td>low-low</td><td class='value-good'>0.73% / 1.01%</td></tr><tr><td>high-low</td><td class='value-good'>0.99% / 1.48%</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/roi_visualizations/sub-223_functional_V1.png" class="thumbnail" onclick="openModal(this.src)"></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/event_related/individual_subjects/sub-223_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Control">
+                <td><strong>224</strong></td>
+                <td>Control</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">56.6%</td>
+                <td class="value-good">0.624%</td>
+                <td><table style='font-size: 11px; margin: 0;'><tr><td>low-high</td><td class='value-good'>0.82% / 1.57%</td></tr><tr><td>high-high</td><td class='value-good'>1.37% / 2.88%</td></tr><tr><td>low-low</td><td class='value-good'>0.04% / 0.60%</td></tr><tr><td>high-low</td><td class='value-good'>0.27% / 0.61%</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/roi_visualizations/sub-224_functional_V1.png" class="thumbnail" onclick="openModal(this.src)"></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/event_related/individual_subjects/sub-224_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Control">
+                <td><strong>225</strong></td>
+                <td>Control</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">55.5%</td>
+                <td class="value-warn">0.208%</td>
+                <td><table style='font-size: 11px; margin: 0;'><tr><td>low-high</td><td class='value-good'>0.06% / 0.48%</td></tr><tr><td>high-high</td><td class='value-good'>0.60% / 1.31%</td></tr><tr><td>low-low</td><td class='value-bad'>-0.02% / 0.15%</td></tr><tr><td>high-low</td><td class='value-good'>0.19% / 0.78%</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/roi_visualizations/sub-225_functional_V1.png" class="thumbnail" onclick="openModal(this.src)"></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/event_related/individual_subjects/sub-225_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Control">
+                <td><strong>227</strong></td>
+                <td>Control</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">68.6%</td>
+                <td class="value-good">0.757%</td>
+                <td><table style='font-size: 11px; margin: 0;'><tr><td>low-high</td><td class='value-good'>0.60% / 1.25%</td></tr><tr><td>high-high</td><td class='value-good'>1.24% / 2.35%</td></tr><tr><td>low-low</td><td class='value-good'>0.35% / 0.70%</td></tr><tr><td>high-low</td><td class='value-good'>0.84% / 1.61%</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/roi_visualizations/sub-227_functional_V1.png" class="thumbnail" onclick="openModal(this.src)"></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/event_related/individual_subjects/sub-227_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Control">
+                <td><strong>214</strong></td>
+                <td>Control</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">69.0%</td>
+                <td class="value-warn">0.152%</td>
+                <td><table style='font-size: 11px; margin: 0;'><tr><td>low-high</td><td class='value-good'>0.47% / 0.85%</td></tr><tr><td>high-high</td><td class='value-good'>0.51% / 1.90%</td></tr><tr><td>low-low</td><td class='value-bad'>-0.28% / 0.35%</td></tr><tr><td>high-low</td><td class='value-bad'>-0.09% / 0.64%</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/roi_visualizations/sub-214_functional_V1.png" class="thumbnail" onclick="openModal(this.src)"></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/event_related/individual_subjects/sub-214_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Control">
+                <td><strong>204</strong></td>
+                <td>Control</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">40.2%</td>
+                <td class="value-warn">0.441%</td>
+                <td><table style='font-size: 11px; margin: 0;'><tr><td>low-high</td><td class='value-good'>0.16% / 0.39%</td></tr><tr><td>high-high</td><td class='value-good'>1.20% / 2.35%</td></tr><tr><td>low-low</td><td class='value-good'>0.01% / 0.50%</td></tr><tr><td>high-low</td><td class='value-good'>0.39% / 0.55%</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/roi_visualizations/sub-204_functional_V1.png" class="thumbnail" onclick="openModal(this.src)"></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/event_related/individual_subjects/sub-204_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Patient">
+                <td><strong>131</strong></td>
+                <td>Patient</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">58.9%</td>
+                <td class="value-good">0.760%</td>
+                <td><table style='font-size: 11px; margin: 0;'><tr><td>low-high</td><td class='value-good'>0.69% / 1.33%</td></tr><tr><td>high-high</td><td class='value-good'>1.18% / 1.95%</td></tr><tr><td>low-low</td><td class='value-good'>0.50% / 0.97%</td></tr><tr><td>high-low</td><td class='value-good'>0.68% / 1.02%</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/roi_visualizations/sub-131_functional_V1.png" class="thumbnail" onclick="openModal(this.src)"></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/event_related/individual_subjects/sub-131_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Control">
+                <td><strong>201</strong></td>
+                <td>Control</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">58.9%</td>
+                <td class="value-warn">0.418%</td>
+                <td><table style='font-size: 11px; margin: 0;'><tr><td>low-high</td><td class='value-good'>1.20% / 2.84%</td></tr><tr><td>high-high</td><td class='value-good'>0.36% / 1.46%</td></tr><tr><td>low-low</td><td class='value-good'>0.55% / 1.35%</td></tr><tr><td>high-low</td><td class='value-bad'>-0.43% / 0.97%</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/roi_visualizations/sub-201_functional_V1.png" class="thumbnail" onclick="openModal(this.src)"></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/event_related/individual_subjects/sub-201_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Patient">
+                <td><strong>103</strong></td>
+                <td>Patient</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-warn">18.7%</td>
+                <td class="value-warn">0.137%</td>
+                <td><table style='font-size: 11px; margin: 0;'><tr><td>low-high</td><td class='value-good'>0.31% / 0.86%</td></tr><tr><td>high-high</td><td class='value-good'>0.64% / 1.92%</td></tr><tr><td>low-low</td><td class='value-bad'>-0.61% / -0.29%</td></tr><tr><td>high-low</td><td class='value-good'>0.21% / 0.55%</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/roi_visualizations/sub-103_functional_V1.png" class="thumbnail" onclick="openModal(this.src)"></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/event_related/individual_subjects/sub-103_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Patient">
+                <td><strong>104</strong></td>
+                <td>Patient</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">70.7%</td>
+                <td class="value-good">0.598%</td>
+                <td><table style='font-size: 11px; margin: 0;'><tr><td>low-high</td><td class='value-good'>0.71% / 1.31%</td></tr><tr><td>high-high</td><td class='value-good'>1.08% / 2.47%</td></tr><tr><td>low-low</td><td class='value-good'>0.09% / 0.49%</td></tr><tr><td>high-low</td><td class='value-good'>0.52% / 1.03%</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/roi_visualizations/sub-104_functional_V1.png" class="thumbnail" onclick="openModal(this.src)"></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/event_related/individual_subjects/sub-104_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Patient">
+                <td><strong>106</strong></td>
+                <td>Patient</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">47.5%</td>
+                <td class="value-warn">0.130%</td>
+                <td><table style='font-size: 11px; margin: 0;'><tr><td>low-high</td><td class='value-good'>0.16% / 1.17%</td></tr><tr><td>high-high</td><td class='value-good'>0.51% / 1.91%</td></tr><tr><td>low-low</td><td class='value-bad'>-0.19% / 0.46%</td></tr><tr><td>high-low</td><td class='value-good'>0.05% / 0.40%</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/roi_visualizations/sub-106_functional_V1.png" class="thumbnail" onclick="openModal(this.src)"></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/event_related/individual_subjects/sub-106_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Patient">
+                <td><strong>107</strong></td>
+                <td>Patient</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">40.7%</td>
+                <td class="value-good">0.618%</td>
+                <td><table style='font-size: 11px; margin: 0;'><tr><td>low-high</td><td class='value-good'>0.54% / 1.01%</td></tr><tr><td>high-high</td><td class='value-good'>1.33% / 2.68%</td></tr><tr><td>low-low</td><td class='value-good'>0.17% / 0.66%</td></tr><tr><td>high-low</td><td class='value-good'>0.43% / 1.13%</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/roi_visualizations/sub-107_functional_V1.png" class="thumbnail" onclick="openModal(this.src)"></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/event_related/individual_subjects/sub-107_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Patient">
+                <td><strong>108</strong></td>
+                <td>Patient</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">60.1%</td>
+                <td class="value-good">0.602%</td>
+                <td><table style='font-size: 11px; margin: 0;'><tr><td>low-high</td><td class='value-good'>0.70% / 1.44%</td></tr><tr><td>high-high</td><td class='value-good'>0.59% / 1.98%</td></tr><tr><td>low-low</td><td class='value-good'>0.33% / 0.87%</td></tr><tr><td>high-low</td><td class='value-good'>0.78% / 1.46%</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/roi_visualizations/sub-108_functional_V1.png" class="thumbnail" onclick="openModal(this.src)"></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/event_related/individual_subjects/sub-108_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Patient">
+                <td><strong>109</strong></td>
+                <td>Patient</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-warn">18.7%</td>
+                <td class="value-good">0.735%</td>
+                <td><table style='font-size: 11px; margin: 0;'><tr><td>low-high</td><td class='value-good'>0.40% / 1.09%</td></tr><tr><td>high-high</td><td class='value-good'>0.83% / 1.86%</td></tr><tr><td>low-low</td><td class='value-good'>0.60% / 1.31%</td></tr><tr><td>high-low</td><td class='value-good'>1.12% / 2.02%</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/roi_visualizations/sub-109_functional_V1.png" class="thumbnail" onclick="openModal(this.src)"></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/event_related/individual_subjects/sub-109_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Patient">
+                <td><strong>110</strong></td>
+                <td>Patient</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">39.6%</td>
+                <td class="value-warn">0.341%</td>
+                <td><table style='font-size: 11px; margin: 0;'><tr><td>low-high</td><td class='value-bad'>-0.07% / 0.32%</td></tr><tr><td>high-high</td><td class='value-good'>0.58% / 2.04%</td></tr><tr><td>low-low</td><td class='value-good'>0.67% / 1.27%</td></tr><tr><td>high-low</td><td class='value-good'>0.19% / 1.62%</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/roi_visualizations/sub-110_functional_V1.png" class="thumbnail" onclick="openModal(this.src)"></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/event_related/individual_subjects/sub-110_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Patient">
+                <td><strong>111</strong></td>
+                <td>Patient</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">29.8%</td>
+                <td class="value-warn">0.497%</td>
+                <td><table style='font-size: 11px; margin: 0;'><tr><td>low-high</td><td class='value-good'>0.73% / 0.91%</td></tr><tr><td>high-high</td><td class='value-good'>0.62% / 1.57%</td></tr><tr><td>low-low</td><td class='value-good'>0.18% / 0.72%</td></tr><tr><td>high-low</td><td class='value-good'>0.46% / 1.10%</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/roi_visualizations/sub-111_functional_V1.png" class="thumbnail" onclick="openModal(this.src)"></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/event_related/individual_subjects/sub-111_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Patient">
+                <td><strong>112</strong></td>
+                <td>Patient</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">72.9%</td>
+                <td class="value-good">0.857%</td>
+                <td><table style='font-size: 11px; margin: 0;'><tr><td>low-high</td><td class='value-good'>0.49% / 1.03%</td></tr><tr><td>high-high</td><td class='value-good'>2.01% / 3.71%</td></tr><tr><td>low-low</td><td class='value-good'>0.71% / 1.18%</td></tr><tr><td>high-low</td><td class='value-good'>0.22% / 0.73%</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/roi_visualizations/sub-112_functional_V1.png" class="thumbnail" onclick="openModal(this.src)"></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/event_related/individual_subjects/sub-112_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Patient">
+                <td><strong>113</strong></td>
+                <td>Patient</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">73.3%</td>
+                <td class="value-good">0.732%</td>
+                <td><table style='font-size: 11px; margin: 0;'><tr><td>low-high</td><td class='value-good'>0.84% / 1.51%</td></tr><tr><td>high-high</td><td class='value-good'>1.17% / 2.82%</td></tr><tr><td>low-low</td><td class='value-good'>0.73% / 1.22%</td></tr><tr><td>high-low</td><td class='value-good'>0.19% / 0.67%</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/roi_visualizations/sub-113_functional_V1.png" class="thumbnail" onclick="openModal(this.src)"></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/event_related/individual_subjects/sub-113_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Patient">
+                <td><strong>115</strong></td>
+                <td>Patient</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">44.8%</td>
+                <td class="value-warn">0.415%</td>
+                <td><table style='font-size: 11px; margin: 0;'><tr><td>low-high</td><td class='value-good'>0.44% / 0.98%</td></tr><tr><td>high-high</td><td class='value-good'>0.71% / 2.00%</td></tr><tr><td>low-low</td><td class='value-good'>0.60% / 0.86%</td></tr><tr><td>high-low</td><td class='value-bad'>-0.10% / 0.33%</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/roi_visualizations/sub-115_functional_V1.png" class="thumbnail" onclick="openModal(this.src)"></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/event_related/individual_subjects/sub-115_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Patient">
+                <td><strong>116</strong></td>
+                <td>Patient</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">63.2%</td>
+                <td class="value-warn">0.340%</td>
+                <td><table style='font-size: 11px; margin: 0;'><tr><td>low-high</td><td class='value-good'>0.47% / 0.98%</td></tr><tr><td>high-high</td><td class='value-good'>0.71% / 1.53%</td></tr><tr><td>low-low</td><td class='value-good'>0.13% / 0.52%</td></tr><tr><td>high-low</td><td class='value-good'>0.05% / 0.45%</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/roi_visualizations/sub-116_functional_V1.png" class="thumbnail" onclick="openModal(this.src)"></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/event_related/individual_subjects/sub-116_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Patient">
+                <td><strong>117</strong></td>
+                <td>Patient</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">21.4%</td>
+                <td class="value-warn">0.236%</td>
+                <td><table style='font-size: 11px; margin: 0;'><tr><td>low-high</td><td class='value-good'>0.72% / 1.11%</td></tr><tr><td>high-high</td><td class='value-good'>0.02% / 0.75%</td></tr><tr><td>low-low</td><td class='value-bad'>-0.23% / 0.01%</td></tr><tr><td>high-low</td><td class='value-good'>0.44% / 0.85%</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/roi_visualizations/sub-117_functional_V1.png" class="thumbnail" onclick="openModal(this.src)"></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/event_related/individual_subjects/sub-117_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Patient">
+                <td><strong>118</strong></td>
+                <td>Patient</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">46.9%</td>
+                <td class="value-good">0.837%</td>
+                <td><table style='font-size: 11px; margin: 0;'><tr><td>low-high</td><td class='value-good'>1.05% / 1.97%</td></tr><tr><td>high-high</td><td class='value-good'>1.43% / 2.94%</td></tr><tr><td>low-low</td><td class='value-good'>0.36% / 0.95%</td></tr><tr><td>high-low</td><td class='value-good'>0.51% / 1.80%</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/roi_visualizations/sub-118_functional_V1.png" class="thumbnail" onclick="openModal(this.src)"></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/event_related/individual_subjects/sub-118_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Patient">
+                <td><strong>120</strong></td>
+                <td>Patient</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">37.0%</td>
+                <td class="value-good">0.504%</td>
+                <td><table style='font-size: 11px; margin: 0;'><tr><td>low-high</td><td class='value-good'>0.30% / 0.75%</td></tr><tr><td>high-high</td><td class='value-good'>1.30% / 2.09%</td></tr><tr><td>low-low</td><td class='value-good'>0.13% / 0.33%</td></tr><tr><td>high-low</td><td class='value-good'>0.28% / 1.01%</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/roi_visualizations/sub-120_functional_V1.png" class="thumbnail" onclick="openModal(this.src)"></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/event_related/individual_subjects/sub-120_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Patient">
+                <td><strong>121</strong></td>
+                <td>Patient</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">35.5%</td>
+                <td class="value-good">0.782%</td>
+                <td><table style='font-size: 11px; margin: 0;'><tr><td>low-high</td><td class='value-good'>0.98% / 1.72%</td></tr><tr><td>high-high</td><td class='value-good'>1.47% / 3.70%</td></tr><tr><td>low-low</td><td class='value-bad'>-0.22% / 0.05%</td></tr><tr><td>high-low</td><td class='value-good'>0.90% / 1.70%</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/roi_visualizations/sub-121_functional_V1.png" class="thumbnail" onclick="openModal(this.src)"></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/event_related/individual_subjects/sub-121_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Patient">
+                <td><strong>122</strong></td>
+                <td>Patient</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">57.9%</td>
+                <td class="value-warn">0.313%</td>
+                <td><table style='font-size: 11px; margin: 0;'><tr><td>low-high</td><td class='value-good'>0.54% / 1.20%</td></tr><tr><td>high-high</td><td class='value-good'>0.52% / 1.10%</td></tr><tr><td>low-low</td><td class='value-bad'>-0.11% / -0.01%</td></tr><tr><td>high-low</td><td class='value-good'>0.30% / 0.47%</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/roi_visualizations/sub-122_functional_V1.png" class="thumbnail" onclick="openModal(this.src)"></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/event_related/individual_subjects/sub-122_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Patient">
+                <td><strong>124</strong></td>
+                <td>Patient</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">58.3%</td>
+                <td class="value-good">1.274%</td>
+                <td><table style='font-size: 11px; margin: 0;'><tr><td>low-high</td><td class='value-good'>1.26% / 2.05%</td></tr><tr><td>high-high</td><td class='value-good'>2.43% / 4.10%</td></tr><tr><td>low-low</td><td class='value-good'>0.50% / 0.90%</td></tr><tr><td>high-low</td><td class='value-good'>0.89% / 1.54%</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/roi_visualizations/sub-124_functional_V1.png" class="thumbnail" onclick="openModal(this.src)"></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/event_related/individual_subjects/sub-124_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Patient">
+                <td><strong>126</strong></td>
+                <td>Patient</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">48.0%</td>
+                <td class="value-warn">0.209%</td>
+                <td><table style='font-size: 11px; margin: 0;'><tr><td>low-high</td><td class='value-good'>0.25% / 0.83%</td></tr><tr><td>high-high</td><td class='value-good'>0.73% / 1.36%</td></tr><tr><td>low-low</td><td class='value-bad'>-0.09% / 0.23%</td></tr><tr><td>high-low</td><td class='value-bad'>-0.05% / 0.33%</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/roi_visualizations/sub-126_functional_V1.png" class="thumbnail" onclick="openModal(this.src)"></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/event_related/individual_subjects/sub-126_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Patient">
+                <td><strong>128</strong></td>
+                <td>Patient</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">33.2%</td>
+                <td class="value-good">0.680%</td>
+                <td><table style='font-size: 11px; margin: 0;'><tr><td>low-high</td><td class='value-good'>0.82% / 1.42%</td></tr><tr><td>high-high</td><td class='value-good'>1.28% / 2.46%</td></tr><tr><td>low-low</td><td class='value-good'>0.21% / 0.73%</td></tr><tr><td>high-low</td><td class='value-good'>0.41% / 1.26%</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/roi_visualizations/sub-128_functional_V1.png" class="thumbnail" onclick="openModal(this.src)"></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/event_related/individual_subjects/sub-128_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Patient">
+                <td><strong>129</strong></td>
+                <td>Patient</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">34.6%</td>
+                <td class="value-good">0.834%</td>
+                <td><table style='font-size: 11px; margin: 0;'><tr><td>low-high</td><td class='value-good'>0.68% / 1.12%</td></tr><tr><td>high-high</td><td class='value-good'>1.66% / 2.79%</td></tr><tr><td>low-low</td><td class='value-good'>0.57% / 0.96%</td></tr><tr><td>high-low</td><td class='value-good'>0.43% / 1.00%</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/roi_visualizations/sub-129_functional_V1.png" class="thumbnail" onclick="openModal(this.src)"></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/event_related/individual_subjects/sub-129_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Patient">
+                <td><strong>130</strong></td>
+                <td>Patient</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">54.2%</td>
+                <td class="value-good">1.163%</td>
+                <td><table style='font-size: 11px; margin: 0;'><tr><td>low-high</td><td class='value-good'>1.18% / 1.84%</td></tr><tr><td>high-high</td><td class='value-good'>2.06% / 3.99%</td></tr><tr><td>low-low</td><td class='value-good'>0.86% / 1.40%</td></tr><tr><td>high-low</td><td class='value-good'>0.55% / 0.93%</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/roi_visualizations/sub-130_functional_V1.png" class="thumbnail" onclick="openModal(this.src)"></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/event_related/individual_subjects/sub-130_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Control">
+                <td><strong>229</strong></td>
+                <td>Control</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">55.9%</td>
+                <td class="value-warn">0.382%</td>
+                <td><table style='font-size: 11px; margin: 0;'><tr><td>low-high</td><td class='value-good'>0.36% / 0.72%</td></tr><tr><td>high-high</td><td class='value-good'>0.69% / 1.42%</td></tr><tr><td>low-low</td><td class='value-good'>0.20% / 0.58%</td></tr><tr><td>high-low</td><td class='value-good'>0.28% / 0.86%</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/roi_visualizations/sub-229_functional_V1.png" class="thumbnail" onclick="openModal(this.src)"></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/event_related/individual_subjects/sub-229_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Control">
+                <td><strong>202</strong></td>
+                <td>Control</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">48.1%</td>
+                <td class="value-good">0.509%</td>
+                <td><table style='font-size: 11px; margin: 0;'><tr><td>low-high</td><td class='value-good'>0.67% / 1.46%</td></tr><tr><td>high-high</td><td class='value-good'>0.72% / 1.61%</td></tr><tr><td>low-low</td><td class='value-good'>0.20% / 0.53%</td></tr><tr><td>high-low</td><td class='value-good'>0.45% / 1.02%</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/roi_visualizations/sub-202_functional_V1.png" class="thumbnail" onclick="openModal(this.src)"></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/event_related/individual_subjects/sub-202_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+            <tr data-status="PASS" data-group="Control">
+                <td><strong>230</strong></td>
+                <td>Control</td>
+                <td><span class="status-PASS">PASS</span></td>
+                <td>None</td>
+                <td class="value-good">62.9%</td>
+                <td class="value-warn">0.452%</td>
+                <td><table style='font-size: 11px; margin: 0;'><tr><td>low-high</td><td class='value-good'>0.12% / 0.85%</td></tr><tr><td>high-high</td><td class='value-good'>0.86% / 2.19%</td></tr><tr><td>low-low</td><td class='value-good'>0.28% / 0.86%</td></tr><tr><td>high-low</td><td class='value-good'>0.55% / 1.43%</td></tr></table></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/roi_visualizations/sub-230_functional_V1.png" class="thumbnail" onclick="openModal(this.src)"></td>
+                <td><img src="/Volumes/drive/AVP-BDD/results/low-level/event_related/individual_subjects/sub-230_all_conditions.png" class="thumbnail" onclick="openModal(this.src)"></td>
+            </tr>
+
+        </tbody>
+    </table>
+    
+    <div id="imageModal" class="modal" onclick="closeModal()">
+        <span class="close">&times;</span>
+        <img class="modal-content" id="modalImage">
+    </div>
+    
+    <script>
+        function openModal(src) {
+            document.getElementById('imageModal').style.display = 'block';
+            document.getElementById('modalImage').src = src;
+        }
+        
+        function closeModal() {
+            document.getElementById('imageModal').style.display = 'none';
+        }
+        
+        function filterTable(filter) {
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            const rows = document.querySelectorAll('#qcTable tbody tr');
+            rows.forEach(row => {
+                if (filter === 'ALL') {
+                    row.style.display = '';
+                } else if (filter === 'FAIL' || filter === 'WARN' || filter === 'PASS') {
+                    row.style.display = row.dataset.status === filter ? '' : 'none';
+                } else if (filter === 'Patient' || filter === 'Control') {
+                    row.style.display = row.dataset.group === filter ? '' : 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>
