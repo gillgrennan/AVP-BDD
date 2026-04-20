@@ -1,0 +1,17 @@
+               Mixed Linear Model Regression Results
+===================================================================
+Model:            MixedLM Dependent Variable: percent_signal_change
+No. Observations: 114     Method:             REML                 
+No. Groups:       57      Scale:              760.7738             
+Min. group size:  2       Log-Likelihood:     -543.0056            
+Max. group size:  2       Converged:          Yes                  
+Mean group size:  2.0                                              
+-------------------------------------------------------------------
+                       Coef.  Std.Err.   z    P>|z|  [0.025  0.975]
+-------------------------------------------------------------------
+Intercept              87.087    6.002 14.509 0.000  75.323  98.851
+group_code              9.029    8.564  1.054 0.292  -7.756  25.813
+freq_code             -45.368    7.243 -6.263 0.000 -59.564 -31.171
+group_code:freq_code    8.474   10.335  0.820 0.412 -11.782  28.729
+Group Var             283.959    6.496                             
+===================================================================
